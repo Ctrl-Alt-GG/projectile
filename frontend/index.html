@@ -1,0 +1,39 @@
+<html lang="hu">
+<head>
+
+    <title>Projectile</title>
+</head>
+<body>
+
+<pre id="data"></pre>
+<script>
+    (function () { // private namespace
+
+        function getData() {
+            return new Promise((resolve, reject) => {
+                fetch("/api/servers", {
+                    method: "GET",
+                }).then(resp => {
+                    if (!resp.ok) {
+                        console.error("resp not ok:", resp.status)
+                        reject(new Error("not good"))
+                    }
+                    resp.json().then(data => {
+                        //console.log("got answer", data)
+                        resolve(data)
+                    }).catch(reject)
+                }).catch(reject)
+            })
+        }
+
+        getData().then((data) => {
+            console.log(data)
+            document.getElementById("data").innerText = JSON.stringify(data)
+        }).catch(err => {
+            console.log(err)
+        })
+
+    })();
+</script>
+</body>
+</html>
