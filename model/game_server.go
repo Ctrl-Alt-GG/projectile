@@ -1,6 +1,9 @@
 package model
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 type Player struct {
 	Name  string `json:"name"`
@@ -18,14 +21,16 @@ func (p Player) Copy() Player {
 }
 
 type GameServer struct {
-	Address string `json:"address"` // this will be our key for simplicity
-	Game    string `json:"game"`    // stuff like, cs2, minecraft, etc.
+	Address  string `json:"address"`  // this will be our key for simplicity
+	Game     string `json:"game"`     // stuff like, cs2, minecraft, etc.
+	LongName string `json:"longName"` // "Counter-Strike 2" for example
 
 	Info string `json:"info"` // optional short text, kinda like motd.
 
 	// meta
-	MaxPlayers      int  `json:"maxPlayers"`
-	PlayersHasScore bool `json:"playersHasScore"`
+	MaxPlayers      int       `json:"maxPlayers"`
+	PlayersHasScore bool      `json:"playersHasScore"`
+	LastUpdate      time.Time `json:"lastUpdate"`
 
 	OnlinePlayers []Player `json:"onlinePlayers"`
 }
@@ -58,7 +63,9 @@ func (g GameServer) Copy() GameServer {
 	return GameServer{
 		Address:         g.Address,
 		Game:            g.Game,
+		LongName:        g.LongName,
 		Info:            g.Info,
+		LastUpdate:      g.LastUpdate,
 		MaxPlayers:      g.MaxPlayers,
 		PlayersHasScore: g.PlayersHasScore,
 		OnlinePlayers:   playersCopy,

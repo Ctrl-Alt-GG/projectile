@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"net/http"
+	"time"
 )
 
 func updateGameServer(ctx *gin.Context) {
@@ -25,6 +26,8 @@ func updateGameServer(ctx *gin.Context) {
 		ctx.Status(http.StatusUnprocessableEntity)
 		return
 	}
+
+	update.LastUpdate = time.Now()
 
 	err = db.StoreUpdate(update)
 	if err != nil {
