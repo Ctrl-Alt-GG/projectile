@@ -64,6 +64,6 @@ func deleteGameServer(ctx *gin.Context) {
 	}
 }
 
-func getAll(ctx *gin.Context) {
+func getAllGameServers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, db.GetAll())
 }

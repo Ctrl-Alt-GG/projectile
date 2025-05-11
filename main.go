@@ -37,12 +37,12 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Second * 30)
-			cnt, err := db.Cleanup()
+			cnt, err := db.CleanupJob()
 			if err != nil {
 				logger.Error("Error while running cleanup job", zap.Error(err))
 			} else {
 				if cnt > 0 {
-					logger.Info("Cleanup cleaned up some records", zap.Int("count", cnt))
+					logger.Info("CleanupJob cleaned up some records", zap.Int("count", cnt))
 				}
 			}
 		}

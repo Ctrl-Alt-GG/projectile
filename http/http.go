@@ -10,18 +10,22 @@ func RunHTTP(logger *zap.Logger) error {
 	r := gin.New()
 	r.Use(goodLoggerMiddleware(logger), gin.Recovery())
 
-	key := env.StringOrPanic("KEY")
-
-	// register stuff
-	r.StaticFile("", "frontend/index.html")
-	r.Static("/static", "frontend/static")
+	key := env.StringOrPanic("WRITE_KEY")
 
 	apiGroup := r.Group("api")
 	apiGroup.Use(goodCORSMiddleware)
+
 	serversGroup := apiGroup.Group("servers")
 	serversGroup.PUT("", goodKeyAuthMiddleware(key), updateGameServer)
 	serversGroup.DELETE(":addr", goodKeyAuthMiddleware(key), deleteGameServer)
-	serversGroup.GET("", getAll)
+	serversGroup.GET("", getAllGameServers)
+
+	announcementGroup := apiGroup.Group("announcement")
+	announcementGroup.GET("", getAnnouncement)
+	announcementGroup.PUT("", goodKeyAuthMiddleware(key), setAnnouncement)
+	announcementGroup.DELETE("", goodKeyAuthMiddleware(key), clearAnnouncement)
+
+	apiGroup.GET("bundle", getBundle) // get all data in one request
 
 	// start stuff
 	tlsCert := env.String("TLS_CERT", "")
