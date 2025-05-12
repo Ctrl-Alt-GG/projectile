@@ -6,18 +6,30 @@ import (
 	"net/http"
 )
 
+// It will be easier to deal with like this
+type AnnouncementWrapper struct {
+	Text string `json:"text"`
+}
+
 func getAnnouncement(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, db.LoadAnnouncement())
+	ctx.JSON(http.StatusOK, AnnouncementWrapper{db.LoadAnnouncement()})
 }
 
 func setAnnouncement(ctx *gin.Context) {
-	var newAnnouncement string
+	var newAnnouncement AnnouncementWrapper
 	err := ctx.BindJSON(&newAnnouncement)
 	if err != nil {
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
-	err = db.StoreAnnouncement(newAnnouncement)
+
+	if newAnnouncement.Text == "" {
+		// don't allow empty
+		ctx.Status(http.StatusUnprocessableEntity)
+		return
+	}
+
+	err = db.StoreAnnouncement(newAnnouncement.Text)
 	if err != nil {
 		ctx.Status(http.StatusInternalServerError)
 		return
