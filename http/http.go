@@ -26,6 +26,7 @@ func RunHTTP(logger *zap.Logger) error {
 	announcementGroup.DELETE("", goodKeyAuthMiddleware(key), clearAnnouncement)
 
 	apiGroup.GET("bundle", getBundle) // get all data in one request
+	apiGroup.GET("ping")
 
 	// start stuff
 	tlsCert := env.String("TLS_CERT", "")

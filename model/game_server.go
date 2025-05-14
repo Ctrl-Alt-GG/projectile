@@ -20,6 +20,21 @@ func (p Player) Copy() Player {
 	}
 }
 
+// GameServerMeta lets us know what dynamic info the agent is capable of reporting
+type GameServerMeta struct {
+	KnowOnlinePlayerCount bool `json:"knowOnlinePlayerCount"` // the playerCount field is usable
+	KnowPlayers           bool `json:"knowPlayers"`           // The onlinePlayers field is usable
+	PlayersHasScore       bool `json:"playersHasScore"`       // the Score field for the players are usable
+}
+
+func (m GameServerMeta) Copy() GameServerMeta {
+	return GameServerMeta{
+		KnowOnlinePlayerCount: m.KnowOnlinePlayerCount,
+		KnowPlayers:           m.KnowPlayers,
+		PlayersHasScore:       m.PlayersHasScore,
+	}
+}
+
 type GameServer struct {
 	Address  string `json:"address"`  // this will be our key for simplicity
 	Game     string `json:"game"`     // stuff like, cs2, minecraft, etc.
@@ -28,9 +43,11 @@ type GameServer struct {
 	Info string `json:"info"` // optional short text, kinda like motd.
 
 	// meta
-	MaxPlayers      int       `json:"maxPlayers"`
-	PlayersHasScore bool      `json:"playersHasScore"`
-	LastUpdate      time.Time `json:"lastUpdate"`
+	PlayerCount int `json:"playerCount"`
+	MaxPlayers  int `json:"maxPlayers"`
+
+	Meta       GameServerMeta `json:"meta"`
+	LastUpdate time.Time      `json:"lastUpdate"`
 
 	OnlinePlayers []Player `json:"onlinePlayers"`
 }
@@ -61,13 +78,14 @@ func (g GameServer) Copy() GameServer {
 	}
 
 	return GameServer{
-		Address:         g.Address,
-		Game:            g.Game,
-		LongName:        g.LongName,
-		Info:            g.Info,
-		LastUpdate:      g.LastUpdate,
-		MaxPlayers:      g.MaxPlayers,
-		PlayersHasScore: g.PlayersHasScore,
-		OnlinePlayers:   playersCopy,
+		Address:       g.Address,
+		Game:          g.Game,
+		LongName:      g.LongName,
+		Info:          g.Info,
+		PlayerCount:   g.PlayerCount,
+		MaxPlayers:    g.MaxPlayers,
+		Meta:          g.Meta.Copy(),
+		LastUpdate:    g.LastUpdate,
+		OnlinePlayers: playersCopy,
 	}
 }

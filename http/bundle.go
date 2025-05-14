@@ -7,13 +7,13 @@ import (
 )
 
 type BundleResp struct {
-	Announcement string             `json:"announcement"`
-	GameServers  []model.GameServer `json:"gameServers"`
+	Announcement AnnouncementWrapper `json:"announcement"`
+	GameServers  []model.GameServer  `json:"gameServers"`
 }
 
 func getBundle(ctx *gin.Context) {
 	ctx.JSON(200, BundleResp{
 		GameServers:  db.GetAll(),
-		Announcement: db.LoadAnnouncement(),
+		Announcement: AnnouncementWrapper{db.LoadAnnouncement()},
 	})
 }
