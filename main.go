@@ -35,8 +35,7 @@ func main() {
 	}
 
 	go func() {
-		for {
-			time.Sleep(time.Second * 30)
+		for range time.Tick(time.Second * 30) {
 			cnt, err := db.CleanupJob()
 			if err != nil {
 				logger.Error("Error while running cleanup job", zap.Error(err))
