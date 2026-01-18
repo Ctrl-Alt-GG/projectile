@@ -2,11 +2,13 @@ package http
 
 import (
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"strings"
-	"time"
 )
 
 const (
@@ -85,15 +87,12 @@ func validateAuthHeader(ctx *gin.Context, key string) bool {
 
 func goodKeyAuthMiddleware(key string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
 		if validateAuthHeader(ctx, key) {
 			ctx.Next()
 		} else {
-			ctx.Status(403)
-			ctx.Abort()
+			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-
 	}
 }
 
@@ -104,7 +103,7 @@ func goodCORSMiddleware(ctx *gin.Context) {
 	ctx.Writer.Header().Set("Access-Control-Allow-Methods", "OPTIONS, GET")
 
 	if ctx.Request.Method == "OPTIONS" {
-		ctx.AbortWithStatus(204)
+		ctx.AbortWithStatus(http.StatusNoContent)
 		return
 	}
 

@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/Ctrl-Alt-GG/projectile/db"
-	"github.com/Ctrl-Alt-GG/projectile/model"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/server/db"
+	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/gin-gonic/gin"
 )
 

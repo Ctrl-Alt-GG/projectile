@@ -1,0 +1,54 @@
+syntax = "proto3";
+package projectile;
+
+option go_package = "github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsg";
+
+service GameServers {
+  rpc Updates(stream GameServer) returns (Error) {}
+  rpc Withdraw(Identifier) returns (Error) {}
+}
+
+enum ErrorType {
+  HAPPY = 0; // i.e.: no errors
+  CLOSING = 1;
+}
+
+message Error {
+  ErrorType type = 1;
+  optional string Message = 2;
+}
+
+message Identifier {
+  string address = 1;
+  string game = 2;
+}
+
+message GameServer {
+  Identifier id = 1;
+  string name = 2;
+
+  repeated string alternate_addresses = 3;
+
+  optional string info = 4; // optional extra info
+
+  message Capabilities {
+    bool player_count = 1;
+    bool player_names = 2;
+    bool player_score = 3;
+    bool player_team = 4;
+  }
+
+  Capabilities capabilities = 5;
+
+  uint32 max_players = 6;
+  optional uint32 online_players_count = 7;
+
+  message Player {
+    string name = 1;
+    optional int32 score = 2;
+    optional string team = 3;
+    optional string info = 4; // optional extra info
+  }
+
+  repeated Player online_players = 8;
+}

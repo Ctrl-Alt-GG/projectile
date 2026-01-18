@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func RunHTTP(logger *zap.Logger) error {
+func RunServer(logger *zap.Logger) error {
 	r := gin.New()
 	r.Use(goodLoggerMiddleware(logger), gin.Recovery())
 
@@ -33,7 +33,7 @@ func RunHTTP(logger *zap.Logger) error {
 	tlsKey := env.String("TLS_KEY", "")
 	tlsEnabled := tlsCert != "" && tlsKey != ""
 
-	address := env.String("BIND_ADDRESS", ":8080")
+	address := env.String("HTTP_BIND_ADDRESS", ":8080")
 
 	// Run gin
 	logger.Info("Starting HTTP Server...", zap.Bool("tlsEnabled", tlsEnabled), zap.String("address", address))
@@ -43,5 +43,4 @@ func RunHTTP(logger *zap.Logger) error {
 		logger.Warn("Running HTTP mode!")
 		return r.Run(address)
 	}
-
 }

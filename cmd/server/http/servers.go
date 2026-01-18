@@ -1,12 +1,13 @@
 package http
 
 import (
-	"github.com/Ctrl-Alt-GG/projectile/db"
-	"github.com/Ctrl-Alt-GG/projectile/model"
-	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"net/http"
 	"time"
+
+	"github.com/Ctrl-Alt-GG/projectile/cmd/server/db"
+	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
+	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 func updateGameServer(ctx *gin.Context) {
@@ -33,6 +34,7 @@ func updateGameServer(ctx *gin.Context) {
 	if err != nil {
 		l.Error("Failed to store update", zap.Error(err))
 		ctx.Status(http.StatusInternalServerError)
+		return
 	}
 
 	l.Debug("Update stored!")
@@ -43,16 +45,22 @@ func updateGameServer(ctx *gin.Context) {
 func deleteGameServer(ctx *gin.Context) {
 	l := GetLoggerFromContext(ctx)
 
-	addr := ctx.Param("addr")
-	if addr == "" {
-		l.Warn("Can not delete empty address")
-		ctx.Status(http.StatusBadRequest)
+	id := model.Identifier{
+		Address: ctx.Param("addr"),
+		Game:    ctx.Param("game"),
 	}
 
-	cnt, err := db.DeleteServer(addr)
+	if !id.IsValid() {
+		l.Warn("ID is invalid", zap.String("id.Address", id.Address), zap.String("id.Game", id.Game))
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
+	cnt, err := db.DeleteServer(id)
 	if err != nil {
 		l.Error("Failed to delete record", zap.Error(err))
 		ctx.Status(http.StatusInternalServerError)
+		return
 	}
 
 	l.Debug("Record deletion completed", zap.Int("deletedRecords", cnt))

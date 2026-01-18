@@ -1,10 +1,11 @@
 package db
 
 import (
-	"github.com/Ctrl-Alt-GG/projectile/model"
 	"slices"
 	"sync"
 	"time"
+
+	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 )
 
 var ( // this is a lame, locking array
@@ -16,8 +17,10 @@ func StoreUpdate(update model.GameServer) error {
 	gameServersLock.Lock()
 	defer gameServersLock.Unlock()
 
+	update.LastUpdate = time.Now()
+
 	idx := slices.IndexFunc(gameServers, func(server model.GameServer) bool {
-		return server.Address == update.Address
+		return server.ID.Equals(update.ID)
 	})
 
 	if idx == -1 {
@@ -29,14 +32,14 @@ func StoreUpdate(update model.GameServer) error {
 	return nil
 }
 
-func DeleteServer(address string) (int, error) {
+func DeleteServer(id model.Identifier) (int, error) {
 	gameServersLock.Lock()
 	defer gameServersLock.Unlock()
 
 	lenBefore := len(gameServers)
 
 	gameServers = slices.DeleteFunc(gameServers, func(server model.GameServer) bool {
-		return server.Address == address
+		return server.ID.Equals(id)
 	})
 
 	return lenBefore - len(gameServers), nil
@@ -58,6 +61,7 @@ func CleanupJob() (int, error) {
 	return lenBefore - len(gameServers), nil
 }
 
+// GetAll makes a deep-ish copy, so later updates in the db does not modify the values returned.
 func GetAll() []model.GameServer {
 	gameServersLock.RLock()
 	defer gameServersLock.RUnlock()

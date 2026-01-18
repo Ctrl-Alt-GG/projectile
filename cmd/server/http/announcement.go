@@ -1,9 +1,10 @@
 package http
 
 import (
-	"github.com/Ctrl-Alt-GG/projectile/db"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/Ctrl-Alt-GG/projectile/cmd/server/db"
+	"github.com/gin-gonic/gin"
 )
 
 // It will be easier to deal with like this
