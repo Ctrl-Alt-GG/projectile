@@ -2,7 +2,6 @@ package http
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/server/db"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
@@ -11,7 +10,13 @@ import (
 )
 
 func updateGameServer(ctx *gin.Context) {
-	l := GetLoggerFromContext(ctx)
+	id := ctx.Param("id")
+	l := GetLoggerFromContext(ctx).With(zap.String("id", id))
+	if id == "" {
+		l.Warn("ID is invalid")
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
 
 	var update model.GameServer
 	err := ctx.BindJSON(&update)
@@ -28,41 +33,21 @@ func updateGameServer(ctx *gin.Context) {
 		return
 	}
 
-	update.LastUpdate = time.Now()
-
-	err = db.StoreUpdate(update)
-	if err != nil {
-		l.Error("Failed to store update", zap.Error(err))
-		ctx.Status(http.StatusInternalServerError)
-		return
-	}
-
+	db.StoreUpdate(id, update) // this updates the last update value
 	l.Debug("Update stored!")
-
 	ctx.Status(http.StatusAccepted)
 }
 
 func deleteGameServer(ctx *gin.Context) {
-	l := GetLoggerFromContext(ctx)
-
-	id := model.Identifier{
-		Address: ctx.Param("addr"),
-		Game:    ctx.Param("game"),
-	}
-
-	if !id.IsValid() {
-		l.Warn("ID is invalid", zap.String("id.Address", id.Address), zap.String("id.Game", id.Game))
+	id := ctx.Param("id")
+	l := GetLoggerFromContext(ctx).With(zap.String("id", id))
+	if id == "" {
+		l.Warn("ID is invalid")
 		ctx.Status(http.StatusBadRequest)
 		return
 	}
 
-	cnt, err := db.DeleteServer(id)
-	if err != nil {
-		l.Error("Failed to delete record", zap.Error(err))
-		ctx.Status(http.StatusInternalServerError)
-		return
-	}
-
+	cnt := db.DeleteServer(id)
 	l.Debug("Record deletion completed", zap.Int("deletedRecords", cnt))
 
 	if cnt == 0 {
@@ -72,6 +57,27 @@ func deleteGameServer(ctx *gin.Context) {
 	}
 }
 
-func getAllGameServers(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, db.GetAll())
+func getGameServer(ctx *gin.Context) {
+	id := ctx.Param("id")
+	l := GetLoggerFromContext(ctx).With(zap.String("id", id))
+	if id == "" {
+		l.Warn("ID is invalid")
+		ctx.Status(http.StatusBadRequest)
+		return
+	}
+
+	srv, ok := db.GetServer(id)
+	if ok {
+		ctx.JSON(http.StatusOK, srv)
+	} else {
+		ctx.Status(http.StatusNotFound)
+	}
+}
+
+func getAllGameServersWithID(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, db.GetMap())
+}
+
+func getAllGameServersNoID(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, db.GetList())
 }

@@ -1,28 +1,15 @@
 package grpc
 
 import (
-	"context"
 	"net"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/server/authn"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg"
 	"gitlab.com/MikeTTh/env"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
-
-type GameServersServerImpl struct {
-	agentmsg.UnimplementedGameServersServer
-}
-
-func (s *GameServersServerImpl) Updates(grpc.ClientStreamingServer[agentmsg.GameServer, agentmsg.Error]) error {
-	// TODO
-	return nil
-}
-
-func (s *GameServersServerImpl) Withdraw(context.Context, *agentmsg.Identifier) (*agentmsg.Error, error) {
-	// TODO
-	return &agentmsg.Error{Type: agentmsg.ErrorType_HAPPY}, nil
-}
 
 func RunServer(logger *zap.Logger) error {
 	address := env.String("GRPC_BIND_ADDRESS", ":50051")
@@ -32,10 +19,55 @@ func RunServer(logger *zap.Logger) error {
 		logger.Error("failed to open GRPC listen socket", zap.Error(err))
 		return err
 	}
+	defer func(lis net.Listener) {
+		err := lis.Close()
+		if err != nil {
+			logger.Warn("Failed to close listener", zap.Error(err))
+		}
+	}(lis)
 
-	grpcServer := grpc.NewServer()
-	agentmsg.RegisterGameServersServer(grpcServer, &GameServersServerImpl{})
+	// setup some options
+	var opts []grpc.ServerOption
 
-	logger.Info("Starting GRPC Server...", zap.String("address", address)) // TODO: TLS // TODO: Auth
+	// first, the TLS
+	tlsCert := env.String("GRPC_TLS_CERT", "")
+	tlsKey := env.String("GRPC_TLS_KEY", "")
+	tlsEnabled := tlsCert != "" && tlsKey != ""
+
+	if tlsEnabled {
+		var tlsCreds credentials.TransportCredentials
+		tlsCreds, err = credentials.NewServerTLSFromFile(tlsCert, tlsKey)
+		if err != nil {
+			logger.Error("Failed to load TLS certs", zap.Error(err))
+			return err
+		}
+		opts = append(opts, grpc.Creds(tlsCreds))
+	} else {
+		logger.Warn("GRPC server running without TLS!")
+	}
+
+	// Second, the interceptors
+
+	basichAuthn, err := authn.NewBasicAuthProvider(env.StringOrPanic("AGENT_HTPASSWD_PATH"))
+	if err != nil {
+		logger.Error("Failed to load basic authentication credentials", zap.Error(err))
+		return err
+	}
+
+	opts = append(opts,
+		grpc.ChainUnaryInterceptor(
+			unaryAuthnInterceptor(basichAuthn),
+			unaryLoggerInterceptor(logger),
+		),
+		grpc.ChainStreamInterceptor(
+			streamingAuthnInterceptor(basichAuthn),
+			streamingLoggerInterceptor(logger),
+		),
+	)
+
+	grpcServer := grpc.NewServer(opts...)
+	agentmsg.RegisterGameServersServer(grpcServer, &GameServersHandler{})
+
+	logger.Info("Starting GRPC Server...", zap.String("address", address), zap.Bool("tlsEnabled", tlsEnabled))
 	return grpcServer.Serve(lis)
 }

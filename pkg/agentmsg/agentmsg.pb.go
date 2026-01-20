@@ -9,6 +9,7 @@ package agentmsg
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -21,161 +22,11 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type ErrorType int32
-
-const (
-	ErrorType_HAPPY   ErrorType = 0 // i.e.: no errors
-	ErrorType_CLOSING ErrorType = 1
-)
-
-// Enum value maps for ErrorType.
-var (
-	ErrorType_name = map[int32]string{
-		0: "HAPPY",
-		1: "CLOSING",
-	}
-	ErrorType_value = map[string]int32{
-		"HAPPY":   0,
-		"CLOSING": 1,
-	}
-)
-
-func (x ErrorType) Enum() *ErrorType {
-	p := new(ErrorType)
-	*p = x
-	return p
-}
-
-func (x ErrorType) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (ErrorType) Descriptor() protoreflect.EnumDescriptor {
-	return file_agentmsg_proto_enumTypes[0].Descriptor()
-}
-
-func (ErrorType) Type() protoreflect.EnumType {
-	return &file_agentmsg_proto_enumTypes[0]
-}
-
-func (x ErrorType) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use ErrorType.Descriptor instead.
-func (ErrorType) EnumDescriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{0}
-}
-
-type Error struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Type          ErrorType              `protobuf:"varint,1,opt,name=type,proto3,enum=projectile.ErrorType" json:"type,omitempty"`
-	Message       *string                `protobuf:"bytes,2,opt,name=Message,proto3,oneof" json:"Message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Error) Reset() {
-	*x = Error{}
-	mi := &file_agentmsg_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Error) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Error) ProtoMessage() {}
-
-func (x *Error) ProtoReflect() protoreflect.Message {
-	mi := &file_agentmsg_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Error.ProtoReflect.Descriptor instead.
-func (*Error) Descriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Error) GetType() ErrorType {
-	if x != nil {
-		return x.Type
-	}
-	return ErrorType_HAPPY
-}
-
-func (x *Error) GetMessage() string {
-	if x != nil && x.Message != nil {
-		return *x.Message
-	}
-	return ""
-}
-
-type Identifier struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Address       string                 `protobuf:"bytes,1,opt,name=address,proto3" json:"address,omitempty"`
-	Game          string                 `protobuf:"bytes,2,opt,name=game,proto3" json:"game,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Identifier) Reset() {
-	*x = Identifier{}
-	mi := &file_agentmsg_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Identifier) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Identifier) ProtoMessage() {}
-
-func (x *Identifier) ProtoReflect() protoreflect.Message {
-	mi := &file_agentmsg_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Identifier.ProtoReflect.Descriptor instead.
-func (*Identifier) Descriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Identifier) GetAddress() string {
-	if x != nil {
-		return x.Address
-	}
-	return ""
-}
-
-func (x *Identifier) GetGame() string {
-	if x != nil {
-		return x.Game
-	}
-	return ""
-}
-
 type GameServer struct {
 	state              protoimpl.MessageState   `protogen:"open.v1"`
-	Id                 *Identifier              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Game               string                   `protobuf:"bytes,1,opt,name=game,proto3" json:"game,omitempty"`
 	Name               string                   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	AlternateAddresses []string                 `protobuf:"bytes,3,rep,name=alternate_addresses,json=alternateAddresses,proto3" json:"alternate_addresses,omitempty"`
+	Addresses          []string                 `protobuf:"bytes,3,rep,name=addresses,proto3" json:"addresses,omitempty"`
 	Info               *string                  `protobuf:"bytes,4,opt,name=info,proto3,oneof" json:"info,omitempty"` // optional extra info
 	Capabilities       *GameServer_Capabilities `protobuf:"bytes,5,opt,name=capabilities,proto3" json:"capabilities,omitempty"`
 	MaxPlayers         uint32                   `protobuf:"varint,6,opt,name=max_players,json=maxPlayers,proto3" json:"max_players,omitempty"`
@@ -187,7 +38,7 @@ type GameServer struct {
 
 func (x *GameServer) Reset() {
 	*x = GameServer{}
-	mi := &file_agentmsg_proto_msgTypes[2]
+	mi := &file_agentmsg_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -199,7 +50,7 @@ func (x *GameServer) String() string {
 func (*GameServer) ProtoMessage() {}
 
 func (x *GameServer) ProtoReflect() protoreflect.Message {
-	mi := &file_agentmsg_proto_msgTypes[2]
+	mi := &file_agentmsg_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -212,14 +63,14 @@ func (x *GameServer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameServer.ProtoReflect.Descriptor instead.
 func (*GameServer) Descriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{2}
+	return file_agentmsg_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GameServer) GetId() *Identifier {
+func (x *GameServer) GetGame() string {
 	if x != nil {
-		return x.Id
+		return x.Game
 	}
-	return nil
+	return ""
 }
 
 func (x *GameServer) GetName() string {
@@ -229,9 +80,9 @@ func (x *GameServer) GetName() string {
 	return ""
 }
 
-func (x *GameServer) GetAlternateAddresses() []string {
+func (x *GameServer) GetAddresses() []string {
 	if x != nil {
-		return x.AlternateAddresses
+		return x.Addresses
 	}
 	return nil
 }
@@ -283,7 +134,7 @@ type GameServer_Capabilities struct {
 
 func (x *GameServer_Capabilities) Reset() {
 	*x = GameServer_Capabilities{}
-	mi := &file_agentmsg_proto_msgTypes[3]
+	mi := &file_agentmsg_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +146,7 @@ func (x *GameServer_Capabilities) String() string {
 func (*GameServer_Capabilities) ProtoMessage() {}
 
 func (x *GameServer_Capabilities) ProtoReflect() protoreflect.Message {
-	mi := &file_agentmsg_proto_msgTypes[3]
+	mi := &file_agentmsg_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +159,7 @@ func (x *GameServer_Capabilities) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameServer_Capabilities.ProtoReflect.Descriptor instead.
 func (*GameServer_Capabilities) Descriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{2, 0}
+	return file_agentmsg_proto_rawDescGZIP(), []int{0, 0}
 }
 
 func (x *GameServer_Capabilities) GetPlayerCount() bool {
@@ -351,7 +202,7 @@ type GameServer_Player struct {
 
 func (x *GameServer_Player) Reset() {
 	*x = GameServer_Player{}
-	mi := &file_agentmsg_proto_msgTypes[4]
+	mi := &file_agentmsg_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -363,7 +214,7 @@ func (x *GameServer_Player) String() string {
 func (*GameServer_Player) ProtoMessage() {}
 
 func (x *GameServer_Player) ProtoReflect() protoreflect.Message {
-	mi := &file_agentmsg_proto_msgTypes[4]
+	mi := &file_agentmsg_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -376,7 +227,7 @@ func (x *GameServer_Player) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GameServer_Player.ProtoReflect.Descriptor instead.
 func (*GameServer_Player) Descriptor() ([]byte, []int) {
-	return file_agentmsg_proto_rawDescGZIP(), []int{2, 1}
+	return file_agentmsg_proto_rawDescGZIP(), []int{0, 1}
 }
 
 func (x *GameServer_Player) GetName() string {
@@ -412,21 +263,12 @@ var File_agentmsg_proto protoreflect.FileDescriptor
 const file_agentmsg_proto_rawDesc = "" +
 	"\n" +
 	"\x0eagentmsg.proto\x12\n" +
-	"projectile\"]\n" +
-	"\x05Error\x12)\n" +
-	"\x04type\x18\x01 \x01(\x0e2\x15.projectile.ErrorTypeR\x04type\x12\x1d\n" +
-	"\aMessage\x18\x02 \x01(\tH\x00R\aMessage\x88\x01\x01B\n" +
+	"projectile\x1a\x1bgoogle/protobuf/empty.proto\"\x97\x05\n" +
 	"\n" +
-	"\b_Message\":\n" +
-	"\n" +
-	"Identifier\x12\x18\n" +
-	"\aaddress\x18\x01 \x01(\tR\aaddress\x12\x12\n" +
-	"\x04game\x18\x02 \x01(\tR\x04game\"\xbe\x05\n" +
-	"\n" +
-	"GameServer\x12&\n" +
-	"\x02id\x18\x01 \x01(\v2\x16.projectile.IdentifierR\x02id\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12/\n" +
-	"\x13alternate_addresses\x18\x03 \x03(\tR\x12alternateAddresses\x12\x17\n" +
+	"GameServer\x12\x12\n" +
+	"\x04game\x18\x01 \x01(\tR\x04game\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\taddresses\x18\x03 \x03(\tR\taddresses\x12\x17\n" +
 	"\x04info\x18\x04 \x01(\tH\x00R\x04info\x88\x01\x01\x12G\n" +
 	"\fcapabilities\x18\x05 \x01(\v2#.projectile.GameServer.CapabilitiesR\fcapabilities\x12\x1f\n" +
 	"\vmax_players\x18\x06 \x01(\rR\n" +
@@ -448,13 +290,10 @@ const file_agentmsg_proto_rawDesc = "" +
 	"\x05_teamB\a\n" +
 	"\x05_infoB\a\n" +
 	"\x05_infoB\x17\n" +
-	"\x15_online_players_count*#\n" +
-	"\tErrorType\x12\t\n" +
-	"\x05HAPPY\x10\x00\x12\v\n" +
-	"\aCLOSING\x10\x012\x80\x01\n" +
-	"\vGameServers\x128\n" +
-	"\aUpdates\x12\x16.projectile.GameServer\x1a\x11.projectile.Error\"\x00(\x01\x127\n" +
-	"\bWithdraw\x12\x16.projectile.Identifier\x1a\x11.projectile.Error\"\x00B9Z7github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsgb\x06proto3"
+	"\x15_online_players_count2\x8a\x01\n" +
+	"\vGameServers\x12=\n" +
+	"\aUpdates\x12\x16.projectile.GameServer\x1a\x16.google.protobuf.Empty\"\x00(\x01\x12<\n" +
+	"\bWithdraw\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00B9Z7github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsgb\x06proto3"
 
 var (
 	file_agentmsg_proto_rawDescOnce sync.Once
@@ -468,30 +307,25 @@ func file_agentmsg_proto_rawDescGZIP() []byte {
 	return file_agentmsg_proto_rawDescData
 }
 
-var file_agentmsg_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_agentmsg_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_agentmsg_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_agentmsg_proto_goTypes = []any{
-	(ErrorType)(0),                  // 0: projectile.ErrorType
-	(*Error)(nil),                   // 1: projectile.Error
-	(*Identifier)(nil),              // 2: projectile.Identifier
-	(*GameServer)(nil),              // 3: projectile.GameServer
-	(*GameServer_Capabilities)(nil), // 4: projectile.GameServer.Capabilities
-	(*GameServer_Player)(nil),       // 5: projectile.GameServer.Player
+	(*GameServer)(nil),              // 0: projectile.GameServer
+	(*GameServer_Capabilities)(nil), // 1: projectile.GameServer.Capabilities
+	(*GameServer_Player)(nil),       // 2: projectile.GameServer.Player
+	(*emptypb.Empty)(nil),           // 3: google.protobuf.Empty
 }
 var file_agentmsg_proto_depIdxs = []int32{
-	0, // 0: projectile.Error.type:type_name -> projectile.ErrorType
-	2, // 1: projectile.GameServer.id:type_name -> projectile.Identifier
-	4, // 2: projectile.GameServer.capabilities:type_name -> projectile.GameServer.Capabilities
-	5, // 3: projectile.GameServer.online_players:type_name -> projectile.GameServer.Player
-	3, // 4: projectile.GameServers.Updates:input_type -> projectile.GameServer
-	2, // 5: projectile.GameServers.Withdraw:input_type -> projectile.Identifier
-	1, // 6: projectile.GameServers.Updates:output_type -> projectile.Error
-	1, // 7: projectile.GameServers.Withdraw:output_type -> projectile.Error
-	6, // [6:8] is the sub-list for method output_type
-	4, // [4:6] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	1, // 0: projectile.GameServer.capabilities:type_name -> projectile.GameServer.Capabilities
+	2, // 1: projectile.GameServer.online_players:type_name -> projectile.GameServer.Player
+	0, // 2: projectile.GameServers.Updates:input_type -> projectile.GameServer
+	3, // 3: projectile.GameServers.Withdraw:input_type -> google.protobuf.Empty
+	3, // 4: projectile.GameServers.Updates:output_type -> google.protobuf.Empty
+	3, // 5: projectile.GameServers.Withdraw:output_type -> google.protobuf.Empty
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_agentmsg_proto_init() }
@@ -501,20 +335,18 @@ func file_agentmsg_proto_init() {
 	}
 	file_agentmsg_proto_msgTypes[0].OneofWrappers = []any{}
 	file_agentmsg_proto_msgTypes[2].OneofWrappers = []any{}
-	file_agentmsg_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_agentmsg_proto_rawDesc), len(file_agentmsg_proto_rawDesc)),
-			NumEnums:      1,
-			NumMessages:   5,
+			NumEnums:      0,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_agentmsg_proto_goTypes,
 		DependencyIndexes: file_agentmsg_proto_depIdxs,
-		EnumInfos:         file_agentmsg_proto_enumTypes,
 		MessageInfos:      file_agentmsg_proto_msgTypes,
 	}.Build()
 	File_agentmsg_proto = out.File

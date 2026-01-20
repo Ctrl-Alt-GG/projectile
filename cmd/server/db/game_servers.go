@@ -1,7 +1,6 @@
 package db
 
 import (
-	"slices"
 	"sync"
 	"time"
 
@@ -9,68 +8,94 @@ import (
 )
 
 var ( // this is a lame, locking array
-	gameServers     []model.GameServer
-	gameServersLock sync.RWMutex
+	gameServers sync.Map
 )
 
-func StoreUpdate(update model.GameServer) error {
-	gameServersLock.Lock()
-	defer gameServersLock.Unlock()
-
+func StoreUpdate(id string, update model.GameServer) {
 	update.LastUpdate = time.Now()
+	gameServers.Store(id, update)
+}
 
-	idx := slices.IndexFunc(gameServers, func(server model.GameServer) bool {
-		return server.ID.Equals(update.ID)
-	})
-
-	if idx == -1 {
-		gameServers = append(gameServers, update)
-	} else {
-		gameServers[idx] = update
+func GetServer(id string) (model.GameServer, bool) {
+	val, ok := gameServers.Load(id)
+	if !ok {
+		return model.GameServer{}, false
+	}
+	srv, ok := val.(model.GameServer)
+	if !ok {
+		return model.GameServer{}, false
 	}
 
-	return nil
+	return srv.Copy(), true
 }
 
-func DeleteServer(id model.Identifier) (int, error) {
-	gameServersLock.Lock()
-	defer gameServersLock.Unlock()
-
-	lenBefore := len(gameServers)
-
-	gameServers = slices.DeleteFunc(gameServers, func(server model.GameServer) bool {
-		return server.ID.Equals(id)
-	})
-
-	return lenBefore - len(gameServers), nil
+func DeleteServer(id string) int {
+	_, loaded := gameServers.LoadAndDelete(id)
+	if loaded {
+		return 1
+	}
+	return 0
 }
 
-func CleanupJob() (int, error) {
-	gameServersLock.Lock()
-	defer gameServersLock.Unlock()
-
+// CleanupJob deletes keys that were updated more than limit duration.
+// NOTE that this function is not doing its thing atomically, so
+// it is possible that when a entry is just updated it's still deleted
+func CleanupJob(limit time.Duration) int {
 	now := time.Now()
+	cnt := 0
+	gameServers.Range(func(key, value any) bool {
+		v, ok := value.(model.GameServer)
+		if !ok {
+			cnt++
+			gameServers.Delete(key)
+			return true
+		}
 
-	lenBefore := len(gameServers)
+		if now.Sub(v.LastUpdate) > limit {
+			cnt++
+			gameServers.Delete(key) // apparently you are safe to do this
+		}
 
-	gameServers = slices.DeleteFunc(gameServers, func(server model.GameServer) bool {
-		// delete entries older than a minute
-		return now.Sub(server.LastUpdate) > time.Minute
+		return true
 	})
 
-	return lenBefore - len(gameServers), nil
+	return cnt
 }
 
-// GetAll makes a deep-ish copy, so later updates in the db does not modify the values returned.
-func GetAll() []model.GameServer {
-	gameServersLock.RLock()
-	defer gameServersLock.RUnlock()
+// GetList makes a deep-ish copy, so later updates in the db does not modify the values returned.
+// The keys are not included in GetList
+func GetList() []model.GameServer {
+	dbCopy := make([]model.GameServer, 0)
 
-	dbCopy := make([]model.GameServer, len(gameServers))
+	gameServers.Range(func(_, value any) bool {
+		v, ok := value.(model.GameServer)
+		if ok {
+			dbCopy = append(dbCopy, v.Copy())
+		}
 
-	for i, val := range gameServers {
-		dbCopy[i] = val.Copy()
-	}
+		return true // continue
+	})
+
+	return dbCopy
+}
+
+// GetMap is similar to GetList, but it returns a map instead, so keys are "visible".
+func GetMap() map[string]model.GameServer {
+	dbCopy := make(map[string]model.GameServer)
+
+	gameServers.Range(func(key, value any) bool {
+		k, ok := key.(string)
+		if !ok {
+			return true
+		}
+		v, ok := value.(model.GameServer)
+		if !ok {
+			return true
+		}
+
+		dbCopy[k] = v.Copy()
+		return true // continue
+	})
 
 	return dbCopy
 }

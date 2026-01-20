@@ -13,7 +13,7 @@ type BundleResp struct {
 
 func getBundle(ctx *gin.Context) {
 	ctx.JSON(200, BundleResp{
-		GameServers:  db.GetAll(),
+		GameServers:  db.GetList(),
 		Announcement: AnnouncementWrapper{db.LoadAnnouncement()},
 	})
 }

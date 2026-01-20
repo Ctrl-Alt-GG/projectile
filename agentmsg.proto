@@ -1,33 +1,20 @@
 syntax = "proto3";
 package projectile;
 
+import "google/protobuf/empty.proto";
+
 option go_package = "github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsg";
 
 service GameServers {
-  rpc Updates(stream GameServer) returns (Error) {}
-  rpc Withdraw(Identifier) returns (Error) {}
-}
-
-enum ErrorType {
-  HAPPY = 0; // i.e.: no errors
-  CLOSING = 1;
-}
-
-message Error {
-  ErrorType type = 1;
-  optional string Message = 2;
-}
-
-message Identifier {
-  string address = 1;
-  string game = 2;
+  rpc Updates(stream GameServer) returns (google.protobuf.Empty) {}
+  rpc Withdraw(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message GameServer {
-  Identifier id = 1;
+  string game = 1;
   string name = 2;
 
-  repeated string alternate_addresses = 3;
+  repeated string addresses = 3;
 
   optional string info = 4; // optional extra info
 

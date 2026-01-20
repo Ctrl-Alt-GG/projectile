@@ -18,13 +18,9 @@ func main() {
 	// db cleanup job
 	go func() {
 		for range time.Tick(time.Second * 30) {
-			cnt, err := db.CleanupJob()
-			if err != nil {
-				logger.Error("Error while running cleanup job", zap.Error(err))
-			} else {
-				if cnt > 0 {
-					logger.Info("CleanupJob cleaned up some records", zap.Int("count", cnt))
-				}
+			cnt := db.CleanupJob(time.Minute)
+			if cnt > 0 {
+				logger.Info("CleanupJob cleaned up some records", zap.Int("count", cnt))
 			}
 		}
 	}()

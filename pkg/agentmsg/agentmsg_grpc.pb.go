@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -27,8 +28,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GameServersClient interface {
-	Updates(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GameServer, Error], error)
-	Withdraw(ctx context.Context, in *Identifier, opts ...grpc.CallOption) (*Error, error)
+	Updates(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GameServer, emptypb.Empty], error)
+	Withdraw(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gameServersClient struct {
@@ -39,22 +40,22 @@ func NewGameServersClient(cc grpc.ClientConnInterface) GameServersClient {
 	return &gameServersClient{cc}
 }
 
-func (c *gameServersClient) Updates(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GameServer, Error], error) {
+func (c *gameServersClient) Updates(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GameServer, emptypb.Empty], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &GameServers_ServiceDesc.Streams[0], GameServers_Updates_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[GameServer, Error]{ClientStream: stream}
+	x := &grpc.GenericClientStream[GameServer, emptypb.Empty]{ClientStream: stream}
 	return x, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GameServers_UpdatesClient = grpc.ClientStreamingClient[GameServer, Error]
+type GameServers_UpdatesClient = grpc.ClientStreamingClient[GameServer, emptypb.Empty]
 
-func (c *gameServersClient) Withdraw(ctx context.Context, in *Identifier, opts ...grpc.CallOption) (*Error, error) {
+func (c *gameServersClient) Withdraw(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Error)
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, GameServers_Withdraw_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -66,8 +67,8 @@ func (c *gameServersClient) Withdraw(ctx context.Context, in *Identifier, opts .
 // All implementations must embed UnimplementedGameServersServer
 // for forward compatibility.
 type GameServersServer interface {
-	Updates(grpc.ClientStreamingServer[GameServer, Error]) error
-	Withdraw(context.Context, *Identifier) (*Error, error)
+	Updates(grpc.ClientStreamingServer[GameServer, emptypb.Empty]) error
+	Withdraw(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGameServersServer()
 }
 
@@ -78,10 +79,10 @@ type GameServersServer interface {
 // pointer dereference when methods are called.
 type UnimplementedGameServersServer struct{}
 
-func (UnimplementedGameServersServer) Updates(grpc.ClientStreamingServer[GameServer, Error]) error {
+func (UnimplementedGameServersServer) Updates(grpc.ClientStreamingServer[GameServer, emptypb.Empty]) error {
 	return status.Errorf(codes.Unimplemented, "method Updates not implemented")
 }
-func (UnimplementedGameServersServer) Withdraw(context.Context, *Identifier) (*Error, error) {
+func (UnimplementedGameServersServer) Withdraw(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Withdraw not implemented")
 }
 func (UnimplementedGameServersServer) mustEmbedUnimplementedGameServersServer() {}
@@ -106,14 +107,14 @@ func RegisterGameServersServer(s grpc.ServiceRegistrar, srv GameServersServer) {
 }
 
 func _GameServers_Updates_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(GameServersServer).Updates(&grpc.GenericServerStream[GameServer, Error]{ServerStream: stream})
+	return srv.(GameServersServer).Updates(&grpc.GenericServerStream[GameServer, emptypb.Empty]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type GameServers_UpdatesServer = grpc.ClientStreamingServer[GameServer, Error]
+type GameServers_UpdatesServer = grpc.ClientStreamingServer[GameServer, emptypb.Empty]
 
 func _GameServers_Withdraw_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Identifier)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -125,7 +126,7 @@ func _GameServers_Withdraw_Handler(srv interface{}, ctx context.Context, dec fun
 		FullMethod: GameServers_Withdraw_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GameServersServer).Withdraw(ctx, req.(*Identifier))
+		return srv.(GameServersServer).Withdraw(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }

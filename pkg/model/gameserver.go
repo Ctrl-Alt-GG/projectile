@@ -12,19 +12,6 @@ import (
 // Currently it does not seem to me a good idea to store protobuf messages directly
 // They seem to contain some state information
 
-type Identifier struct {
-	Address string `json:"address"`
-	Game    string `json:"game"`
-}
-
-func (i Identifier) Equals(otherID Identifier) bool {
-	return i.Address == otherID.Address && i.Game == otherID.Game
-}
-
-func (i Identifier) IsValid() bool {
-	return i.Address != "" && i.Game != ""
-}
-
 type Capabilities struct {
 	PlayerCount bool `json:"player_count"`
 	PlayerNames bool `json:"player_names"`
@@ -53,9 +40,9 @@ type Player struct {
 }
 
 type GameServer struct {
-	ID                 Identifier   `json:"id"`
-	AlternateAddresses []string     `json:"alternate_addresses"`
+	Game               string       `json:"game"`
 	Name               string       `json:"name"`
+	Addresses          []string     `json:"addresses"`
 	Info               string       `json:"info"`
 	Capabilities       Capabilities `json:"capabilities"`
 	MaxPlayers         uint32       `json:"max_players"`
@@ -68,13 +55,10 @@ type GameServer struct {
 
 func (gs GameServer) ToProtobuf() *agentmsg.GameServer {
 	pb := agentmsg.GameServer{
-		Id: &agentmsg.Identifier{
-			Address: gs.ID.Address,
-			Game:    gs.ID.Game,
-		},
-		Name:               gs.Name,
-		AlternateAddresses: gs.AlternateAddresses,
-		Info:               utils.NilStrPtr(gs.Info),
+		Game:      gs.Game,
+		Name:      gs.Name,
+		Addresses: gs.Addresses,
+		Info:      utils.NilStrPtr(gs.Info),
 		Capabilities: &agentmsg.GameServer_Capabilities{
 			PlayerCount: gs.Capabilities.PlayerCount,
 			PlayerNames: gs.Capabilities.PlayerNames,
@@ -131,9 +115,9 @@ func (gs GameServer) Copy() GameServer {
 	}
 
 	return GameServer{
-		ID:                 gs.ID,
-		AlternateAddresses: slices.Clone(gs.AlternateAddresses),
+		Game:               gs.Game,
 		Name:               gs.Name,
+		Addresses:          slices.Clone(gs.Addresses),
 		Info:               gs.Info,
 		Capabilities:       gs.Capabilities,
 		MaxPlayers:         gs.MaxPlayers,
@@ -144,8 +128,19 @@ func (gs GameServer) Copy() GameServer {
 }
 
 func (gs GameServer) Validate() error {
-	if gs.ID.IsValid() {
-		return fmt.Errorf("ID is invalid")
+	if gs.Game == "" {
+		return fmt.Errorf("game is empty")
+	}
+	if gs.Name == "" {
+		return fmt.Errorf("name is empty")
+	}
+	if len(gs.Addresses) == 0 {
+		return fmt.Errorf("addresses is empty")
+	}
+	for _, addr := range gs.Addresses {
+		if addr == "" {
+			return fmt.Errorf("one or more addresses are empty")
+		}
 	}
 
 	if gs.Capabilities.IsValid() {
@@ -156,10 +151,6 @@ func (gs GameServer) Validate() error {
 }
 
 func GameServerFromProtobuf(server *agentmsg.GameServer) (GameServer, bool) {
-	serverID := server.GetId()
-	if serverID == nil {
-		return GameServer{}, false
-	}
 	serverCaps := server.GetCapabilities()
 	if serverCaps == nil {
 		return GameServer{}, false
@@ -170,17 +161,11 @@ func GameServerFromProtobuf(server *agentmsg.GameServer) (GameServer, bool) {
 		PlayerScore: serverCaps.GetPlayerScore(),
 		PlayerTeam:  serverCaps.GetPlayerTeam(),
 	}
-	if !translatedCaps.IsValid() {
-		return GameServer{}, false
-	}
 
 	gs := GameServer{
-		ID: Identifier{
-			Address: serverID.GetAddress(),
-			Game:    serverID.GetGame(),
-		},
-		AlternateAddresses: server.GetAlternateAddresses(),
+		Game:               server.GetName(),
 		Name:               server.GetName(),
+		Addresses:          server.GetAddresses(),
 		Info:               server.GetInfo(),
 		Capabilities:       translatedCaps,
 		MaxPlayers:         server.GetMaxPlayers(),

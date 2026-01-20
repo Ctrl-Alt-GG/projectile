@@ -10,27 +10,37 @@ func RunServer(logger *zap.Logger) error {
 	r := gin.New()
 	r.Use(goodLoggerMiddleware(logger), gin.Recovery())
 
-	key := env.StringOrPanic("WRITE_KEY")
+	key := env.StringOrPanic("ADMIN_KEY")
 
+	// API root
 	apiGroup := r.Group("api")
 	apiGroup.Use(goodCORSMiddleware)
 
-	serversGroup := apiGroup.Group("servers")
-	serversGroup.PUT("", goodKeyAuthMiddleware(key), updateGameServer)
-	serversGroup.DELETE(":addr", goodKeyAuthMiddleware(key), deleteGameServer)
-	serversGroup.GET("", getAllGameServers)
+	// Admin stuff
+	adminGroup := apiGroup.Group("admin")
+	adminGroup.Use(goodKeyAuthMiddleware(key))
 
-	announcementGroup := apiGroup.Group("announcement")
+	serversGroup := adminGroup.Group("servers")
+	serversGroup.PUT(":id", updateGameServer)
+	serversGroup.DELETE(":id", deleteGameServer)
+	serversGroup.GET(":id", getGameServer)
+	serversGroup.GET("", getAllGameServersWithID)
+
+	announcementGroup := adminGroup.Group("announcement")
 	announcementGroup.GET("", getAnnouncement)
-	announcementGroup.PUT("", goodKeyAuthMiddleware(key), setAnnouncement)
-	announcementGroup.DELETE("", goodKeyAuthMiddleware(key), clearAnnouncement)
+	announcementGroup.PUT("", setAnnouncement)
+	announcementGroup.DELETE("", clearAnnouncement)
 
+	// no-auth stuff
+
+	apiGroup.GET("servers", getAllGameServersNoID)
+	apiGroup.GET("announcement", getAnnouncement)
 	apiGroup.GET("bundle", getBundle) // get all data in one request
 	apiGroup.GET("ping")
 
 	// start stuff
-	tlsCert := env.String("TLS_CERT", "")
-	tlsKey := env.String("TLS_KEY", "")
+	tlsCert := env.String("HTTPS_TLS_CERT", "")
+	tlsKey := env.String("HTTPS_TLS_KEY", "")
 	tlsEnabled := tlsCert != "" && tlsKey != ""
 
 	address := env.String("HTTP_BIND_ADDRESS", ":8080")
