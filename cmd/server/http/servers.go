@@ -18,7 +18,7 @@ func updateGameServer(ctx *gin.Context) {
 		return
 	}
 
-	var update model.GameServer
+	var update model.GameServerData
 	err := ctx.BindJSON(&update)
 	if err != nil {
 		l.Warn("Unable to parse body", zap.Error(err))
@@ -33,7 +33,7 @@ func updateGameServer(ctx *gin.Context) {
 		return
 	}
 
-	db.StoreUpdate(id, update) // this updates the last update value
+	db.StoreGameServerData(id, update) // this updates the last update value
 	l.Debug("Update stored!")
 	ctx.Status(http.StatusAccepted)
 }
@@ -74,10 +74,10 @@ func getGameServer(ctx *gin.Context) {
 	}
 }
 
-func getAllGameServersWithID(ctx *gin.Context) {
+func getAllGameServersAdmin(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, db.GetMap())
 }
 
-func getAllGameServersNoID(ctx *gin.Context) {
+func getAllGameServersPublic(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, db.GetList())
 }

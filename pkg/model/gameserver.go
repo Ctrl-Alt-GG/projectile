@@ -39,42 +39,75 @@ type Player struct {
 	Info  string  `json:"info"`
 }
 
-type GameServer struct {
-	Game               string       `json:"game"`
-	Name               string       `json:"name"`
-	Addresses          []string     `json:"addresses"`
-	Info               string       `json:"info"`
-	Capabilities       Capabilities `json:"capabilities"`
-	MaxPlayers         uint32       `json:"max_players"`
-	OnlinePlayersCount *uint32      `json:"online_players,omitempty"`
-	OnlinePlayers      *[]Player    `json:"players,omitempty"`
-
-	// I'm not a fan of this
-	LastUpdate time.Time `json:"last_update"`
+// GameServerDynamicData is data, that have the probability to change every scrape.
+type GameServerDynamicData struct {
+	Info               string    `json:"info"`
+	MaxPlayers         uint32    `json:"max_players"`
+	OnlinePlayersCount *uint32   `json:"online_players,omitempty"`
+	OnlinePlayers      *[]Player `json:"players,omitempty"`
 }
 
-func (gs GameServer) ToProtobuf() *agentmsg.GameServer {
+// GameServerStaticData is data, that probably does not change between each scrape.
+// That's because it probably comes from the config or is a characteristic of the scraper.
+// That data can still change on the server side, because the agent can be restarted with a different config.
+type GameServerStaticData struct {
+	Game         string       `json:"game"`
+	Name         string       `json:"name"`
+	Addresses    []string     `json:"addresses"`
+	Capabilities Capabilities `json:"capabilities"`
+}
+
+func (gssd GameServerStaticData) Validate() error {
+	if gssd.Game == "" {
+		return fmt.Errorf("game is empty")
+	}
+	if gssd.Name == "" {
+		return fmt.Errorf("name is empty")
+	}
+	if len(gssd.Addresses) == 0 {
+		return fmt.Errorf("addresses is empty")
+	}
+	for _, addr := range gssd.Addresses {
+		if addr == "" {
+			return fmt.Errorf("one or more addresses are empty")
+		}
+	}
+
+	if gssd.Capabilities.IsValid() {
+		return fmt.Errorf("capabilities are invalid")
+	}
+
+	return nil
+}
+
+// GameServerData is all the info about a game server we want to present
+type GameServerData struct {
+	GameServerStaticData
+	GameServerDynamicData
+}
+
+func (gsd GameServerData) ToProtobuf() *agentmsg.GameServer {
 	pb := agentmsg.GameServer{
-		Game:      gs.Game,
-		Name:      gs.Name,
-		Addresses: gs.Addresses,
-		Info:      utils.NilStrPtr(gs.Info),
+		Game:      gsd.Game,
+		Name:      gsd.Name,
+		Addresses: gsd.Addresses,
+		Info:      utils.NilStrPtr(gsd.Info),
 		Capabilities: &agentmsg.GameServer_Capabilities{
-			PlayerCount: gs.Capabilities.PlayerCount,
-			PlayerNames: gs.Capabilities.PlayerNames,
-			PlayerScore: gs.Capabilities.PlayerScore,
-			PlayerTeam:  gs.Capabilities.PlayerTeam,
+			PlayerCount: gsd.Capabilities.PlayerCount,
+			PlayerNames: gsd.Capabilities.PlayerNames,
+			PlayerScore: gsd.Capabilities.PlayerScore,
+			PlayerTeam:  gsd.Capabilities.PlayerTeam,
 		},
-		MaxPlayers:         gs.MaxPlayers,
+		MaxPlayers:         gsd.MaxPlayers,
 		OnlinePlayersCount: nil,
 		OnlinePlayers:      nil,
 	}
-	if gs.Capabilities.PlayerCount {
-		pb.OnlinePlayersCount = gs.OnlinePlayersCount
+	if gsd.Capabilities.PlayerCount {
+		pb.OnlinePlayersCount = gsd.OnlinePlayersCount
 	}
-	if gs.Capabilities.PlayerNames && gs.OnlinePlayers != nil {
-		pb.OnlinePlayers = make([]*agentmsg.GameServer_Player, len(*gs.OnlinePlayers))
-		for i, ply := range *gs.OnlinePlayers {
+	if gsd.Capabilities.PlayerNames && gsd.OnlinePlayers != nil {
+		pb.OnlinePlayers = make([]*agentmsg.GameServer_Player, len(*gsd.OnlinePlayers))
+		for i, ply := range *gsd.OnlinePlayers {
 			pb.OnlinePlayers[i] = &agentmsg.GameServer_Player{
 				Name:  ply.Name,
 				Score: nil,
@@ -82,11 +115,11 @@ func (gs GameServer) ToProtobuf() *agentmsg.GameServer {
 				Info:  utils.NilStrPtr(ply.Info),
 			}
 
-			if gs.Capabilities.PlayerScore {
+			if gsd.Capabilities.PlayerScore {
 				pb.OnlinePlayers[i].Score = ply.Score
 			}
 
-			if gs.Capabilities.PlayerTeam {
+			if gsd.Capabilities.PlayerTeam {
 				pb.OnlinePlayers[i].Team = ply.Team
 			}
 		}
@@ -95,14 +128,14 @@ func (gs GameServer) ToProtobuf() *agentmsg.GameServer {
 	return &pb
 }
 
-func (gs GameServer) Copy() GameServer {
+func (gsd GameServerData) Copy() GameServerData {
 
 	var playersCopy *[]Player
 
-	if gs.OnlinePlayers != nil {
-		p := make([]Player, len(*gs.OnlinePlayers))
+	if gsd.OnlinePlayers != nil {
+		p := make([]Player, len(*gsd.OnlinePlayers))
 
-		for i, ply := range *gs.OnlinePlayers {
+		for i, ply := range *gsd.OnlinePlayers {
 			p[i] = Player{
 				Name:  ply.Name,
 				Score: utils.ValCopy(ply.Score),
@@ -114,46 +147,26 @@ func (gs GameServer) Copy() GameServer {
 		playersCopy = &p
 	}
 
-	return GameServer{
-		Game:               gs.Game,
-		Name:               gs.Name,
-		Addresses:          slices.Clone(gs.Addresses),
-		Info:               gs.Info,
-		Capabilities:       gs.Capabilities,
-		MaxPlayers:         gs.MaxPlayers,
-		OnlinePlayersCount: utils.ValCopy(gs.OnlinePlayersCount), // Ptr actually makes a copy, while simply dereferencing doesn't. See https://goplay.tools/snippet/ipMDVGHhgOU
-		OnlinePlayers:      playersCopy,
-		LastUpdate:         gs.LastUpdate,
+	return GameServerData{
+		GameServerStaticData: GameServerStaticData{
+			Game:         gsd.Game,
+			Name:         gsd.Name,
+			Addresses:    slices.Clone(gsd.Addresses),
+			Capabilities: gsd.Capabilities,
+		},
+		GameServerDynamicData: GameServerDynamicData{
+			Info:               gsd.Info,
+			MaxPlayers:         gsd.MaxPlayers,
+			OnlinePlayersCount: utils.ValCopy(gsd.OnlinePlayersCount), // Ptr actually makes a copy, while simply dereferencing doesn't. See https://goplay.tools/snippet/ipMDVGHhgOU
+			OnlinePlayers:      playersCopy,
+		},
 	}
 }
 
-func (gs GameServer) Validate() error {
-	if gs.Game == "" {
-		return fmt.Errorf("game is empty")
-	}
-	if gs.Name == "" {
-		return fmt.Errorf("name is empty")
-	}
-	if len(gs.Addresses) == 0 {
-		return fmt.Errorf("addresses is empty")
-	}
-	for _, addr := range gs.Addresses {
-		if addr == "" {
-			return fmt.Errorf("one or more addresses are empty")
-		}
-	}
-
-	if gs.Capabilities.IsValid() {
-		return fmt.Errorf("capabilities are invalid")
-	}
-
-	return nil
-}
-
-func GameServerFromProtobuf(server *agentmsg.GameServer) (GameServer, bool) {
+func GameServerDataFromProtobuf(server *agentmsg.GameServer) (GameServerData, bool) {
 	serverCaps := server.GetCapabilities()
 	if serverCaps == nil {
-		return GameServer{}, false
+		return GameServerData{}, false
 	}
 	translatedCaps := Capabilities{
 		PlayerCount: serverCaps.GetPlayerCount(),
@@ -162,18 +175,22 @@ func GameServerFromProtobuf(server *agentmsg.GameServer) (GameServer, bool) {
 		PlayerTeam:  serverCaps.GetPlayerTeam(),
 	}
 
-	gs := GameServer{
-		Game:               server.GetName(),
-		Name:               server.GetName(),
-		Addresses:          server.GetAddresses(),
-		Info:               server.GetInfo(),
-		Capabilities:       translatedCaps,
-		MaxPlayers:         server.GetMaxPlayers(),
-		OnlinePlayersCount: nil,
-		OnlinePlayers:      nil,
+	gsd := GameServerData{
+		GameServerStaticData: GameServerStaticData{
+			Game:         server.GetName(),
+			Name:         server.GetName(),
+			Addresses:    server.GetAddresses(),
+			Capabilities: translatedCaps,
+		},
+		GameServerDynamicData: GameServerDynamicData{
+			Info:               server.GetInfo(),
+			MaxPlayers:         server.GetMaxPlayers(),
+			OnlinePlayersCount: nil,
+			OnlinePlayers:      nil,
+		},
 	}
 	if translatedCaps.PlayerCount {
-		gs.OnlinePlayersCount = utils.Ptr(server.GetOnlinePlayersCount())
+		gsd.OnlinePlayersCount = utils.Ptr(server.GetOnlinePlayersCount())
 	}
 
 	serverOnlinePlayers := server.GetOnlinePlayers()
@@ -198,8 +215,22 @@ func GameServerFromProtobuf(server *agentmsg.GameServer) (GameServer, bool) {
 
 		}
 
-		gs.OnlinePlayers = &players
+		gsd.OnlinePlayers = &players
 	}
 
-	return gs, true
+	return gsd, true
+}
+
+// StoredGameServerData is just GameServerData with a timestamp
+// We store these on the server side
+type StoredGameServerData struct {
+	GameServerData
+	LastUpdate time.Time `json:"last_update"`
+}
+
+func (sgsd StoredGameServerData) Copy() StoredGameServerData {
+	return StoredGameServerData{
+		GameServerData: sgsd.GameServerData.Copy(),
+		LastUpdate:     sgsd.LastUpdate,
+	}
 }

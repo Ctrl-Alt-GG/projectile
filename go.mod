@@ -3,6 +3,7 @@ module github.com/Ctrl-Alt-GG/projectile
 go 1.24.2
 
 require (
+	github.com/SpencerSharkey/gomc v0.0.0-20171215012004-e16df85c4e5f
 	github.com/abbot/go-http-auth v0.4.1-0.20230310155302-b2a0e3997b9a
 	github.com/gin-gonic/gin v1.10.0
 	github.com/stretchr/testify v1.10.0

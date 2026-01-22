@@ -11,19 +11,22 @@ var ( // this is a lame, locking array
 	gameServers sync.Map
 )
 
-func StoreUpdate(id string, update model.GameServer) {
-	update.LastUpdate = time.Now()
-	gameServers.Store(id, update)
+func StoreGameServerData(id string, update model.GameServerData) {
+	sgsd := model.StoredGameServerData{
+		GameServerData: update,
+		LastUpdate:     time.Now(),
+	}
+	gameServers.Store(id, sgsd)
 }
 
-func GetServer(id string) (model.GameServer, bool) {
+func GetServer(id string) (model.StoredGameServerData, bool) {
 	val, ok := gameServers.Load(id)
 	if !ok {
-		return model.GameServer{}, false
+		return model.StoredGameServerData{}, false
 	}
-	srv, ok := val.(model.GameServer)
+	srv, ok := val.(model.StoredGameServerData)
 	if !ok {
-		return model.GameServer{}, false
+		return model.StoredGameServerData{}, false
 	}
 
 	return srv.Copy(), true
@@ -39,12 +42,12 @@ func DeleteServer(id string) int {
 
 // CleanupJob deletes keys that were updated more than limit duration.
 // NOTE that this function is not doing its thing atomically, so
-// it is possible that when a entry is just updated it's still deleted
+// it is possible that when an entry is just updated it's still deleted
 func CleanupJob(limit time.Duration) int {
 	now := time.Now()
 	cnt := 0
 	gameServers.Range(func(key, value any) bool {
-		v, ok := value.(model.GameServer)
+		v, ok := value.(model.StoredGameServerData)
 		if !ok {
 			cnt++
 			gameServers.Delete(key)
@@ -63,14 +66,14 @@ func CleanupJob(limit time.Duration) int {
 }
 
 // GetList makes a deep-ish copy, so later updates in the db does not modify the values returned.
-// The keys are not included in GetList
-func GetList() []model.GameServer {
-	dbCopy := make([]model.GameServer, 0)
+// The keys and update timestamps are not included in GetList
+func GetList() []model.GameServerData {
+	dbCopy := make([]model.GameServerData, 0)
 
 	gameServers.Range(func(_, value any) bool {
-		v, ok := value.(model.GameServer)
+		v, ok := value.(model.StoredGameServerData)
 		if ok {
-			dbCopy = append(dbCopy, v.Copy())
+			dbCopy = append(dbCopy, v.GameServerData.Copy())
 		}
 
 		return true // continue
@@ -80,15 +83,15 @@ func GetList() []model.GameServer {
 }
 
 // GetMap is similar to GetList, but it returns a map instead, so keys are "visible".
-func GetMap() map[string]model.GameServer {
-	dbCopy := make(map[string]model.GameServer)
+func GetMap() map[string]model.StoredGameServerData {
+	dbCopy := make(map[string]model.StoredGameServerData)
 
 	gameServers.Range(func(key, value any) bool {
 		k, ok := key.(string)
 		if !ok {
 			return true
 		}
-		v, ok := value.(model.GameServer)
+		v, ok := value.(model.StoredGameServerData)
 		if !ok {
 			return true
 		}

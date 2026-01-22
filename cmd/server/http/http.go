@@ -24,7 +24,7 @@ func RunServer(logger *zap.Logger) error {
 	serversGroup.PUT(":id", updateGameServer)
 	serversGroup.DELETE(":id", deleteGameServer)
 	serversGroup.GET(":id", getGameServer)
-	serversGroup.GET("", getAllGameServersWithID)
+	serversGroup.GET("", getAllGameServersAdmin)
 
 	announcementGroup := adminGroup.Group("announcement")
 	announcementGroup.GET("", getAnnouncement)
@@ -33,7 +33,7 @@ func RunServer(logger *zap.Logger) error {
 
 	// no-auth stuff
 
-	apiGroup.GET("servers", getAllGameServersNoID)
+	apiGroup.GET("servers", getAllGameServersPublic)
 	apiGroup.GET("announcement", getAnnouncement)
 	apiGroup.GET("bundle", getBundle) // get all data in one request
 	apiGroup.GET("ping")

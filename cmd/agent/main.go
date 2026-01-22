@@ -28,16 +28,19 @@ func main() {
 	var i uint32
 	for {
 		i++
-		msg := model.GameServer{
-			Game:               "",
-			Name:               "",
-			Addresses:          nil,
-			Info:               "",
-			Capabilities:       model.Capabilities{},
-			MaxPlayers:         i,
-			OnlinePlayersCount: nil,
-			OnlinePlayers:      nil,
-			LastUpdate:         time.Time{},
+		msg := model.GameServerData{
+			GameServerStaticData: model.GameServerStaticData{
+				Game:         "",
+				Name:         "",
+				Addresses:    nil,
+				Capabilities: model.Capabilities{},
+			},
+			GameServerDynamicData: model.GameServerDynamicData{
+				Info:               "",
+				MaxPlayers:         i,
+				OnlinePlayersCount: nil,
+				OnlinePlayers:      nil,
+			},
 		}
 
 		err = stream.Send(msg.ToProtobuf())

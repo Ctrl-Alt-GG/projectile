@@ -1,3 +1,5 @@
+github.com/SpencerSharkey/gomc v0.0.0-20171215012004-e16df85c4e5f h1:dNxrBxG9FbASjw1765L0BeZWJDp4Hcic8OY8e0VQI4s=
+github.com/SpencerSharkey/gomc v0.0.0-20171215012004-e16df85c4e5f/go.mod h1:58QQEsSHOjPSpUB/LMKNb0t8eUZTmGJa+jmvO/HA8HQ=
 github.com/abbot/go-http-auth v0.4.1-0.20230310155302-b2a0e3997b9a h1:EIyoOgXbgPYS3e+ztkLL5OiPCxHAu8gm517b6+0JwLc=
 github.com/abbot/go-http-auth v0.4.1-0.20230310155302-b2a0e3997b9a/go.mod h1:uTNVOLr085BLgMc4j+RCfKv0erLHtm6sxVoi/buPSTk=
 github.com/bytedance/sonic v1.13.2 h1:8/H1FempDZqC4VqjptGo14QQlJx8VdZJegxs6wwfqpQ=

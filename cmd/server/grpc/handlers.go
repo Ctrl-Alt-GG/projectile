@@ -38,13 +38,13 @@ func (s *GameServersHandler) Updates(stream grpc.ClientStreamingServer[agentmsg.
 			return err
 		}
 
-		update, ok := model.GameServerFromProtobuf(updateMsg)
+		update, ok := model.GameServerDataFromProtobuf(updateMsg)
 		if !ok {
 			l.Warn("Client sent an invalid error")
 			return ErrInvalidUpdate
 		}
 
-		db.StoreUpdate(id, update)
+		db.StoreGameServerData(id, update)
 		l.Debug("Update stored")
 	}
 }

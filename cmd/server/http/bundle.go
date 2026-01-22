@@ -7,8 +7,8 @@ import (
 )
 
 type BundleResp struct {
-	Announcement AnnouncementWrapper `json:"announcement"`
-	GameServers  []model.GameServer  `json:"gameServers"`
+	Announcement AnnouncementWrapper    `json:"announcement"`
+	GameServers  []model.GameServerData `json:"gameServers"`
 }
 
 func getBundle(ctx *gin.Context) {

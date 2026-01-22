@@ -61,7 +61,7 @@ func (x *GameServer) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GameServer.ProtoReflect.Descriptor instead.
+// Deprecated: Use GameServerData.ProtoReflect.Descriptor instead.
 func (*GameServer) Descriptor() ([]byte, []int) {
 	return file_agentmsg_proto_rawDescGZIP(), []int{0}
 }
@@ -265,16 +265,16 @@ const file_agentmsg_proto_rawDesc = "" +
 	"\x0eagentmsg.proto\x12\n" +
 	"projectile\x1a\x1bgoogle/protobuf/empty.proto\"\x97\x05\n" +
 	"\n" +
-	"GameServer\x12\x12\n" +
+	"GameServerData\x12\x12\n" +
 	"\x04game\x18\x01 \x01(\tR\x04game\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
 	"\taddresses\x18\x03 \x03(\tR\taddresses\x12\x17\n" +
 	"\x04info\x18\x04 \x01(\tH\x00R\x04info\x88\x01\x01\x12G\n" +
-	"\fcapabilities\x18\x05 \x01(\v2#.projectile.GameServer.CapabilitiesR\fcapabilities\x12\x1f\n" +
+	"\fcapabilities\x18\x05 \x01(\v2#.projectile.GameServerData.CapabilitiesR\fcapabilities\x12\x1f\n" +
 	"\vmax_players\x18\x06 \x01(\rR\n" +
 	"maxPlayers\x125\n" +
 	"\x14online_players_count\x18\a \x01(\rH\x01R\x12onlinePlayersCount\x88\x01\x01\x12D\n" +
-	"\x0eonline_players\x18\b \x03(\v2\x1d.projectile.GameServer.PlayerR\ronlinePlayers\x1a\x98\x01\n" +
+	"\x0eonline_players\x18\b \x03(\v2\x1d.projectile.GameServerData.PlayerR\ronlinePlayers\x1a\x98\x01\n" +
 	"\fCapabilities\x12!\n" +
 	"\fplayer_count\x18\x01 \x01(\bR\vplayerCount\x12!\n" +
 	"\fplayer_names\x18\x02 \x01(\bR\vplayerNames\x12!\n" +
@@ -292,7 +292,7 @@ const file_agentmsg_proto_rawDesc = "" +
 	"\x05_infoB\x17\n" +
 	"\x15_online_players_count2\x8a\x01\n" +
 	"\vGameServers\x12=\n" +
-	"\aUpdates\x12\x16.projectile.GameServer\x1a\x16.google.protobuf.Empty\"\x00(\x01\x12<\n" +
+	"\aUpdates\x12\x16.projectile.GameServerData\x1a\x16.google.protobuf.Empty\"\x00(\x01\x12<\n" +
 	"\bWithdraw\x12\x16.google.protobuf.Empty\x1a\x16.google.protobuf.Empty\"\x00B9Z7github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsgb\x06proto3"
 
 var (
@@ -309,15 +309,15 @@ func file_agentmsg_proto_rawDescGZIP() []byte {
 
 var file_agentmsg_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_agentmsg_proto_goTypes = []any{
-	(*GameServer)(nil),              // 0: projectile.GameServer
-	(*GameServer_Capabilities)(nil), // 1: projectile.GameServer.Capabilities
-	(*GameServer_Player)(nil),       // 2: projectile.GameServer.Player
+	(*GameServer)(nil),              // 0: projectile.GameServerData
+	(*GameServer_Capabilities)(nil), // 1: projectile.GameServerData.Capabilities
+	(*GameServer_Player)(nil),       // 2: projectile.GameServerData.Player
 	(*emptypb.Empty)(nil),           // 3: google.protobuf.Empty
 }
 var file_agentmsg_proto_depIdxs = []int32{
-	1, // 0: projectile.GameServer.capabilities:type_name -> projectile.GameServer.Capabilities
-	2, // 1: projectile.GameServer.online_players:type_name -> projectile.GameServer.Player
-	0, // 2: projectile.GameServers.Updates:input_type -> projectile.GameServer
+	1, // 0: projectile.GameServerData.capabilities:type_name -> projectile.GameServerData.Capabilities
+	2, // 1: projectile.GameServerData.online_players:type_name -> projectile.GameServerData.Player
+	0, // 2: projectile.GameServers.Updates:input_type -> projectile.GameServerData
 	3, // 3: projectile.GameServers.Withdraw:input_type -> google.protobuf.Empty
 	3, // 4: projectile.GameServers.Updates:output_type -> google.protobuf.Empty
 	3, // 5: projectile.GameServers.Withdraw:output_type -> google.protobuf.Empty
