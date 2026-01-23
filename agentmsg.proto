@@ -8,6 +8,7 @@ option go_package = "github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg;agentmsg";
 service GameServers {
   rpc Updates(stream GameServer) returns (google.protobuf.Empty) {}
   rpc Withdraw(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc Ping(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message GameServer {

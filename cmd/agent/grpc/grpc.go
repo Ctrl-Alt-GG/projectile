@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"sync"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg"
 	"gitlab.com/MikeTTh/env"
 	"go.uber.org/zap"
@@ -28,6 +29,10 @@ func NewClientManager(addr, id, key string) *ClientManager {
 		conn: nil,
 		mu:   sync.Mutex{},
 	}
+}
+
+func NewClientManagerFromConfig(server config.Server) *ClientManager {
+	return NewClientManager(server.Address, server.ID, server.Key)
 }
 
 func (cm *ClientManager) GetGRPCClient(logger *zap.Logger) (agentmsg.GameServersClient, error) {

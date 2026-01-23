@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	logger := framework.SetupLogger()
+	logger := framework.SetupLogger(false)
 	defer logger.Sync()
 	logger.Info("Starting Projectile server...")
 

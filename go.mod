@@ -5,12 +5,14 @@ go 1.24.2
 require (
 	github.com/SpencerSharkey/gomc v0.0.0-20171215012004-e16df85c4e5f
 	github.com/abbot/go-http-auth v0.4.1-0.20230310155302-b2a0e3997b9a
+	github.com/creasty/defaults v1.8.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/stretchr/testify v1.10.0
 	gitlab.com/MikeTTh/env v0.0.0-20231129141211-633d5922a426
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.78.0
 	google.golang.org/protobuf v1.36.10
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -44,5 +46,4 @@ require (
 	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251029180050-ab9386a59fda // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

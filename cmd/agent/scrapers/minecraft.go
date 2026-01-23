@@ -13,6 +13,10 @@ type MinecraftScraper struct {
 	addr string
 }
 
+func NewMinecraftScraperFromConfig(cfg map[string]any) (Scraper, error) {
+	return MinecraftScraper{addr: "TODO"}, nil // TODO
+}
+
 func (m MinecraftScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	req := query.NewRequest()
 	err := req.Connect(m.addr)

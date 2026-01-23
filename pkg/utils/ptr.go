@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 func Ptr[T any](t T) *T {
 	return &t
 }
@@ -16,4 +18,12 @@ func NilStrPtr(t string) *string {
 		return nil
 	}
 	return &t
+}
+
+func FormatPtr[T any](p *T) string {
+	if p == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf("%+v", *p)
 }

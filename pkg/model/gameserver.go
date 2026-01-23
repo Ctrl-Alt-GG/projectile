@@ -177,7 +177,7 @@ func GameServerDataFromProtobuf(server *agentmsg.GameServer) (GameServerData, bo
 
 	gsd := GameServerData{
 		GameServerStaticData: GameServerStaticData{
-			Game:         server.GetName(),
+			Game:         server.GetGame(),
 			Name:         server.GetName(),
 			Addresses:    server.GetAddresses(),
 			Capabilities: translatedCaps,

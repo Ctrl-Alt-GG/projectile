@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	GameServers_Updates_FullMethodName  = "/projectile.GameServers/Updates"
 	GameServers_Withdraw_FullMethodName = "/projectile.GameServers/Withdraw"
+	GameServers_Ping_FullMethodName     = "/projectile.GameServers/Ping"
 )
 
 // GameServersClient is the client API for GameServers service.
@@ -30,6 +31,7 @@ const (
 type GameServersClient interface {
 	Updates(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[GameServer, emptypb.Empty], error)
 	Withdraw(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type gameServersClient struct {
@@ -63,12 +65,23 @@ func (c *gameServersClient) Withdraw(ctx context.Context, in *emptypb.Empty, opt
 	return out, nil
 }
 
+func (c *gameServersClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, GameServers_Ping_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GameServersServer is the server API for GameServers service.
 // All implementations must embed UnimplementedGameServersServer
 // for forward compatibility.
 type GameServersServer interface {
 	Updates(grpc.ClientStreamingServer[GameServer, emptypb.Empty]) error
 	Withdraw(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	mustEmbedUnimplementedGameServersServer()
 }
 
@@ -84,6 +97,9 @@ func (UnimplementedGameServersServer) Updates(grpc.ClientStreamingServer[GameSer
 }
 func (UnimplementedGameServersServer) Withdraw(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Withdraw not implemented")
+}
+func (UnimplementedGameServersServer) Ping(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (UnimplementedGameServersServer) mustEmbedUnimplementedGameServersServer() {}
 func (UnimplementedGameServersServer) testEmbeddedByValue()                     {}
@@ -131,6 +147,24 @@ func _GameServers_Withdraw_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GameServers_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GameServersServer).Ping(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GameServers_Ping_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GameServersServer).Ping(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GameServers_ServiceDesc is the grpc.ServiceDesc for GameServers service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +175,10 @@ var GameServers_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Withdraw",
 			Handler:    _GameServers_Withdraw_Handler,
+		},
+		{
+			MethodName: "Ping",
+			Handler:    _GameServers_Ping_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

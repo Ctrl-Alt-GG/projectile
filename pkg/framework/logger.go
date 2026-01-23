@@ -9,8 +9,8 @@ import (
 	"go.uber.org/zap"
 )
 
-func SetupLogger() *zap.Logger {
-	debugMode := env.Bool("DEBUG", false) || slices.Contains(os.Args, "--debug") || slices.Contains(os.Args, "-debug")
+func SetupLogger(debug bool) *zap.Logger {
+	debugMode := env.Bool("DEBUG", false) || slices.Contains(os.Args, "--debug") || slices.Contains(os.Args, "-debug") || debug
 
 	// Setup logger
 	var err error

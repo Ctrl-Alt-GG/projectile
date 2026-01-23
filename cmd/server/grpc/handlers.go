@@ -58,3 +58,10 @@ func (s *GameServersHandler) Withdraw(ctx context.Context, _ *emptypb.Empty) (*e
 	}
 	return nil, nil
 }
+
+func (s *GameServersHandler) Ping(ctx context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
+	l := getLoggerFromCtx(ctx)
+	id := getIDFromCtx(ctx)
+	l.Debug("Received ping", zap.String("id", id))
+	return nil, nil
+}
