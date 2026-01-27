@@ -12,7 +12,7 @@ openssl req -x509 -out localhost.crt -keyout localhost.key \
    printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 
 
-cat > /tmp/projectile/config.yaml <<< EOF
+cat > /tmp/projectile/config.yaml << EOF
 gameData:
   game: "dummy"
   name: "Dummy Game"

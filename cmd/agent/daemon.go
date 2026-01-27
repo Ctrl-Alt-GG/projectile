@@ -236,7 +236,8 @@ func daemon() {
 		return
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
 	_, err = c.Withdraw(ctx, nil)
 	if err != nil {
 		logger.Error("Failed to send the withdraw message", zap.Error(err))

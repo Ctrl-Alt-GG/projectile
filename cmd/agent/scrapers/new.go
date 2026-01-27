@@ -1,6 +1,12 @@
 package scrapers
 
-import "github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
+import (
+	"errors"
+
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
+)
+
+var ErrInvalidScraper = errors.New("invalid scraper")
 
 func FromConfig(scraperCfg config.Scraper) (Scraper, error) {
 	var scraper Scraper
@@ -11,6 +17,12 @@ func FromConfig(scraperCfg config.Scraper) (Scraper, error) {
 		scraper = DummyScraper{}
 	case "minecraft":
 		scraper, err = NewMinecraftScraperFromConfig(scraperCfg.Config)
+	case "static":
+		scraper, err = NewStaticScraperFromConfig(scraperCfg.Config)
+	case "valve":
+		scraper, err = NewValveScraperFromConfig(scraperCfg.Config)
+	default:
+		return nil, ErrInvalidScraper
 	}
 	if err != nil {
 		return nil, err

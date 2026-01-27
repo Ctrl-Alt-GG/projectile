@@ -6,22 +6,32 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/SpencerSharkey/gomc/query"
+	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 )
 
+type MinecraftServerConfig struct {
+	Address string `mapstructure:"address"`
+}
 type MinecraftScraper struct {
-	addr string
+	config MinecraftServerConfig
 }
 
 func NewMinecraftScraperFromConfig(cfg map[string]any) (Scraper, error) {
-	return MinecraftScraper{addr: "TODO"}, nil // TODO
+	var sConfig MinecraftServerConfig
+
+	err := mapstructure.Decode(cfg, &sConfig)
+	if err != nil {
+		return nil, err
+	}
+	return MinecraftScraper{config: sConfig}, nil
 }
 
 func (m MinecraftScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	req := query.NewRequest()
-	err := req.Connect(m.addr)
+	err := req.Connect(m.config.Address)
 	if err != nil {
-		logger.Error("Failed to connect to the Minecraft server", zap.Error(err), zap.String("addr", m.addr))
+		logger.Error("Failed to connect to the Minecraft server", zap.Error(err), zap.String("addr", m.config.Address))
 		return model.GameServerDynamicData{}, err
 	}
 
@@ -31,7 +41,7 @@ func (m MinecraftScraper) Scrape(ctx context.Context, logger *zap.Logger) (model
 
 	res, err := req.Full()
 	if err != nil {
-		logger.Error("Failed query the Minecraft server", zap.Error(err), zap.String("addr", m.addr))
+		logger.Error("Failed query the Minecraft server", zap.Error(err), zap.String("addr", m.config.Address))
 		return model.GameServerDynamicData{}, err
 	}
 
