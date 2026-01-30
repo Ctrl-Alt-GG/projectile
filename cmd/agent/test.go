@@ -47,7 +47,7 @@ func testPingServer(logger *zap.Logger, cm *grpc.ClientManager) {
 	fmt.Println("  Success! latency:", delay)
 }
 
-func testScrapeServer(logger *zap.Logger, scraper scrapers.Scraper) model.GameServerDynamicData {
+func testScrapeServer(logger *zap.Logger, scraper scrapers.Scraper) (model.GameServerDynamicData, error) {
 	fmt.Println("Running a test scrape...")
 
 	startTime := time.Now()
@@ -55,7 +55,7 @@ func testScrapeServer(logger *zap.Logger, scraper scrapers.Scraper) model.GameSe
 	delay := time.Since(startTime)
 	if err != nil {
 		fmt.Println("  FAILED:", err)
-		return model.GameServerDynamicData{}
+		return model.GameServerDynamicData{}, err
 	}
 
 	fmt.Println("  Info:", data.Info)
@@ -74,7 +74,7 @@ func testScrapeServer(logger *zap.Logger, scraper scrapers.Scraper) model.GameSe
 	}
 
 	fmt.Println("Scrape took", delay)
-	return data
+	return data, nil
 }
 
 func testScraperStaticInfo(scraper scrapers.Scraper) {
@@ -117,10 +117,12 @@ func test() {
 	testScraperStaticInfo(scraper)
 
 	fmt.Println("---")
-	data := testScrapeServer(logger, scraper)
+	data, scrapeErr := testScrapeServer(logger, scraper)
 
-	fmt.Println("---")
-	testMsg(logger, cfg.GameData, scraper, data)
+	if scrapeErr == nil {
+		fmt.Println("---")
+		testMsg(logger, cfg.GameData, scraper, data)
+	}
 
 	fmt.Println("---")
 	cm := grpc.NewClientManagerFromConfig(cfg.Server)

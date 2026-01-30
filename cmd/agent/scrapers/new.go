@@ -19,6 +19,8 @@ func FromConfig(scraperCfg config.Scraper) (Scraper, error) {
 		scraper, err = NewMinecraftScraperFromConfig(scraperCfg.Config)
 	case "static":
 		scraper, err = NewStaticScraperFromConfig(scraperCfg.Config)
+	case "script":
+		scraper, err = NewScriptScraperFromConfig(scraperCfg.Config)
 	case "valve":
 		scraper, err = NewValveScraperFromConfig(scraperCfg.Config)
 	default:

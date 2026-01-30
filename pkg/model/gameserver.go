@@ -13,10 +13,10 @@ import (
 // They seem to contain some state information
 
 type Capabilities struct {
-	PlayerCount bool `json:"player_count"`
-	PlayerNames bool `json:"player_names"`
-	PlayerScore bool `json:"player_score"`
-	PlayerTeam  bool `json:"player_team"`
+	PlayerCount bool `json:"player_count" mapstructure:"player_count"`
+	PlayerNames bool `json:"player_names" mapstructure:"player_names"`
+	PlayerScore bool `json:"player_score" mapstructure:"player_score"`
+	PlayerTeam  bool `json:"player_team" mapstructure:"player_team"`
 }
 
 func (c Capabilities) IsValid() bool {
