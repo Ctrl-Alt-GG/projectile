@@ -1,4 +1,4 @@
-package static
+package supertuxkart
 
 import (
 	"context"
@@ -8,12 +8,14 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type ScraperConfig struct {
-	PSGrep     string `mapstructure:"psgrep"`
-	Info       string `mapstructure:"info"`
-	MaxPlayers uint32 `mapstructure:"max_players"`
+	DBPath     string `mapstructure:"db_path"`
+	PSGrep     string `mapstructure:"psgrep"`      // ensure that the server is running by looking for the executable
+	MaxPlayers uint32 `mapstructure:"max_players"` // I'm just gonna hard-code this here...
 }
 
 type Scraper struct {
@@ -32,7 +34,6 @@ func New(cfg map[string]any) (scrapers.Scraper, error) {
 }
 
 func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
-
 	if s.config.PSGrep != "" {
 		running, err := utils.PSGrep(s.config.PSGrep)
 		if err != nil {
@@ -40,21 +41,28 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 			return model.GameServerDynamicData{}, err
 		}
 		if !running {
-			return model.GameServerDynamicData{}, ErrStaticScraperProcessNotRunning
+			return model.GameServerDynamicData{}, ErrServerProcessNotRunning
 		}
 		logger.Debug("The expected process is running")
 	}
 
+	players, err := QueryPlayers(ctx, logger, s.config.DBPath)
+	if err != nil {
+		logger.Error("Failed to query players", zap.Error(err))
+		return model.GameServerDynamicData{}, err
+	}
+
 	return model.GameServerDynamicData{
-		Info:       s.config.Info,
-		MaxPlayers: s.config.MaxPlayers,
+		MaxPlayers:         s.config.MaxPlayers,
+		OnlinePlayersCount: utils.Ptr(uint32(len(players))),
+		OnlinePlayers:      &players,
 	}, nil
 }
 
 func (s Scraper) Capabilities() model.Capabilities {
 	return model.Capabilities{
-		PlayerCount: false,
-		PlayerNames: false,
+		PlayerCount: true,
+		PlayerNames: true,
 		PlayerScore: false,
 		PlayerTeam:  false,
 	}
