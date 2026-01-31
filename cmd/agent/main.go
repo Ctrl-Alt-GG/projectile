@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) < 1 {
+	if len(os.Args) < 2 {
 		fmt.Println("Usage: agent [daemon|test] (-debug)")
 		return
 	}
@@ -16,5 +16,7 @@ func main() {
 		daemon()
 	case "test":
 		test()
+	default:
+		fmt.Println("Invalid mode. Valid modes: daemon, test")
 	}
 }

@@ -16,6 +16,7 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/framework"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
+	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 	ggrpc "google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -29,13 +30,21 @@ func baseGameDataFromConfig(cfg config.GameData) model.GameServerStaticData {
 	}
 }
 
-func initGameServerData(loggger *zap.Logger, cfg config.GameData, scraper scrapers.Scraper) model.GameServerData {
+func initGameServerData(logger *zap.Logger, cfg config.GameData, scraper scrapers.Scraper) model.GameServerData {
 	data := model.GameServerData{ // we will re-use this
 		GameServerStaticData: baseGameDataFromConfig(cfg),
 	}
 	if len(data.GameServerStaticData.Addresses) == 0 {
-		loggger.Debug("Figuring out game server addresses...")
-		// TODO!!
+		logger.Debug("Figuring out game server addresses...")
+
+		outIP, err := utils.GetOutboundIP("")
+		if err != nil {
+			logger.Warn("Could not determine outbound IP of the local host!", zap.Error(err))
+		} else {
+			logger.Info("Determined the local IP address", zap.String("ip", outIP.String()))
+			data.GameServerStaticData.Addresses = []string{outIP.String()}
+		}
+
 	}
 	data.GameServerStaticData.Capabilities = scraper.Capabilities()
 	return data
