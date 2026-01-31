@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -38,6 +39,18 @@ func initGameServerData(loggger *zap.Logger, cfg config.GameData, scraper scrape
 	}
 	data.GameServerStaticData.Capabilities = scraper.Capabilities()
 	return data
+}
+
+func protectedScrape(scraper scrapers.Scraper, ctx context.Context, logger *zap.Logger) (d model.GameServerDynamicData, err error) {
+	defer func() {
+		r := recover()
+		if r != nil {
+			err = fmt.Errorf("run-time panic: %v", r) // should override the return value
+			logger.Error("Scraper PANIC!", zap.Error(err))
+		}
+	}()
+	d, err = scraper.Scrape(ctx, logger)
+	return
 }
 
 func daemon() {
@@ -81,7 +94,7 @@ func daemon() {
 			case <-t.C:
 				l.Debug("Running scraper...")
 				ctx, cancel := context.WithTimeout(parentCtx, cfg.Scraper.Timeout)
-				d, err := scraper.Scrape(ctx, l)
+				d, err := protectedScrape(scraper, ctx, l)
 				cancel()
 				if err != nil {
 					l.Error("Error while running the scraper", zap.Error(err))
@@ -223,6 +236,8 @@ func daemon() {
 
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, syscall.SIGTERM, syscall.SIGINT)
+
+	logger.Info("All ready")
 
 	<-signalCh
 
