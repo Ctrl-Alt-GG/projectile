@@ -1,4 +1,4 @@
-package scrapers
+package script
 
 import (
 	"context"
@@ -6,12 +6,13 @@ import (
 	"errors"
 	"os/exec"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 )
 
-type ScriptScraperConfig struct {
+type ScraperConfig struct {
 	Path         string             `mapstructure:"path"`
 	Args         []string           `mapstructure:"args"`
 	Env          []string           `mapstructure:"env"`
@@ -19,22 +20,22 @@ type ScriptScraperConfig struct {
 	Capabilities model.Capabilities `mapstructure:"capabilities"`
 }
 
-type ScriptScraper struct {
-	config ScriptScraperConfig
+type Scraper struct {
+	config ScraperConfig
 }
 
-func NewScriptScraperFromConfig(cfg map[string]any) (Scraper, error) {
-	var sConfig ScriptScraperConfig
+func New(cfg map[string]any) (scrapers.Scraper, error) {
+	var sConfig ScraperConfig
 
 	err := mapstructure.Decode(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	return ScriptScraper{config: sConfig}, nil
+	return Scraper{config: sConfig}, nil
 }
 
-func (s ScriptScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	// build the command
 	x := exec.CommandContext(ctx, s.config.Path, s.config.Args...)
 	x.Env = append(x.Environ(), s.config.Env...)
@@ -79,6 +80,6 @@ func (s ScriptScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.Ga
 	return output, nil
 }
 
-func (s ScriptScraper) Capabilities() model.Capabilities {
+func (s Scraper) Capabilities() model.Capabilities {
 	return s.config.Capabilities
 }

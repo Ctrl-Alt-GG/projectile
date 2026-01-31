@@ -11,6 +11,7 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/grpc"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/registry"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/agentmsg"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/framework"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
@@ -54,7 +55,7 @@ func daemon() {
 
 	// Scraper part
 
-	scraper, err := scrapers.FromConfig(cfg.Scraper)
+	scraper, err := registry.NewScraperFromConfig(cfg.Scraper)
 	if err != nil {
 		logger.Error("Failed to instantiate scraper from config!", zap.Error(err))
 		return

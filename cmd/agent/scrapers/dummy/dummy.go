@@ -1,18 +1,23 @@
-package scrapers
+package dummy
 
 import (
 	"context"
 	"math/rand/v2"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 )
 
 // DummyScraper is intended for testing purposes only, it just generates some random data each scrape...
-type DummyScraper struct{}
+type Scraper struct{}
 
-func (d DummyScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+func New(map[string]any) (scrapers.Scraper, error) {
+	return Scraper{}, nil
+}
+
+func (d Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	dummyNames := []string{
 		"ASDfighter", "Yoloman", "Superman",
 		"Batman", "Lajos", "UnnamedPlayer",
@@ -54,7 +59,7 @@ func (d DummyScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.Gam
 	}, nil
 }
 
-func (d DummyScraper) Capabilities() model.Capabilities {
+func (d Scraper) Capabilities() model.Capabilities {
 	return model.Capabilities{
 		PlayerCount: true,
 		PlayerNames: true,

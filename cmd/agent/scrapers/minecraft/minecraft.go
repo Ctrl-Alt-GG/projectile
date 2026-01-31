@@ -1,8 +1,9 @@
-package scrapers
+package minecraft
 
 import (
 	"context"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/SpencerSharkey/gomc/query"
@@ -10,24 +11,24 @@ import (
 	"go.uber.org/zap"
 )
 
-type MinecraftServerConfig struct {
+type ScraperConfig struct {
 	Address string `mapstructure:"address"`
 }
-type MinecraftScraper struct {
-	config MinecraftServerConfig
+type Scraper struct {
+	config ScraperConfig
 }
 
-func NewMinecraftScraperFromConfig(cfg map[string]any) (Scraper, error) {
-	var sConfig MinecraftServerConfig
+func New(cfg map[string]any) (scrapers.Scraper, error) {
+	var sConfig ScraperConfig
 
 	err := mapstructure.Decode(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}
-	return MinecraftScraper{config: sConfig}, nil
+	return Scraper{config: sConfig}, nil
 }
 
-func (m MinecraftScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+func (m Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	req := query.NewRequest()
 	err := req.Connect(m.config.Address)
 	if err != nil {
@@ -60,7 +61,7 @@ func (m MinecraftScraper) Scrape(ctx context.Context, logger *zap.Logger) (model
 	}, nil
 }
 
-func (m MinecraftScraper) Capabilities() model.Capabilities {
+func (m Scraper) Capabilities() model.Capabilities {
 	return model.Capabilities{
 		PlayerCount: true,
 		PlayerNames: true,

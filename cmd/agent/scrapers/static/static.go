@@ -1,4 +1,4 @@
-package scrapers
+package static
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/mitchellh/go-ps"
@@ -14,28 +15,28 @@ import (
 
 var ErrStaticScraperProcessNotRunning = errors.New("process not running")
 
-type StaticScraperConfig struct {
+type ScraperConfig struct {
 	PSGrep     string `mapstructure:"psgrep"`
 	Info       string `mapstructure:"info"`
 	MaxPlayers uint32 `mapstructure:"max_players"`
 }
 
-type StaticScraper struct {
-	config StaticScraperConfig
+type Scraper struct {
+	config ScraperConfig
 }
 
-func NewStaticScraperFromConfig(cfg map[string]any) (Scraper, error) {
-	var sConfig StaticScraperConfig
+func New(cfg map[string]any) (scrapers.Scraper, error) {
+	var sConfig ScraperConfig
 
 	err := mapstructure.Decode(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	return StaticScraper{config: sConfig}, nil
+	return Scraper{config: sConfig}, nil
 }
 
-func (s StaticScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 
 	if s.config.PSGrep != "" {
 		processes, err := ps.Processes()
@@ -58,7 +59,7 @@ func (s StaticScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.Ga
 	}, nil
 }
 
-func (s StaticScraper) Capabilities() model.Capabilities {
+func (s Scraper) Capabilities() model.Capabilities {
 	return model.Capabilities{
 		PlayerCount: false,
 		PlayerNames: false,

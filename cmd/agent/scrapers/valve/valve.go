@@ -1,8 +1,9 @@
-package scrapers
+package valve
 
 import (
 	"context"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/go-viper/mapstructure/v2"
@@ -10,26 +11,26 @@ import (
 	"go.uber.org/zap"
 )
 
-type ValveScraperConfig struct {
+type ScraperConfig struct {
 	Address string `mapstructure:"address"`
 }
 
-type ValveScraper struct {
-	config ValveScraperConfig
+type Scraper struct {
+	config ScraperConfig
 }
 
-func NewValveScraperFromConfig(cfg map[string]any) (Scraper, error) {
-	var sConfig ValveScraperConfig
+func New(cfg map[string]any) (scrapers.Scraper, error) {
+	var sConfig ScraperConfig
 
 	err := mapstructure.Decode(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}
 
-	return ValveScraper{config: sConfig}, nil
+	return Scraper{config: sConfig}, nil
 }
 
-func (s ValveScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 	client, err := a2s.NewClient(s.config.Address)
 	if err != nil {
 		logger.Error("Failed to create new client to query the server", zap.Error(err))
@@ -73,7 +74,7 @@ func (s ValveScraper) Scrape(ctx context.Context, logger *zap.Logger) (model.Gam
 	}, nil
 }
 
-func (s ValveScraper) Capabilities() model.Capabilities {
+func (s Scraper) Capabilities() model.Capabilities {
 	return model.Capabilities{
 		PlayerCount: true,
 		PlayerNames: true,

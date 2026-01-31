@@ -10,6 +10,7 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/grpc"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
+	scraperregistry "github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/registry"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/framework"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
@@ -94,8 +95,19 @@ func testMsg(logger *zap.Logger, cfg config.GameData, scraper scrapers.Scraper, 
 	printStruct(data)
 }
 
+func listScrapers() {
+	fmt.Println("Registered scrapers:")
+	for _, name := range scraperregistry.ListScrapers() {
+		fmt.Println("  -", name)
+	}
+}
+
 func test() {
 	fmt.Println("Running agent test...")
+
+	listScrapers()
+	fmt.Println("---")
+
 	logger := framework.SetupLogger(true)
 
 	cfg, err := config.LoadConfig(logger, "")
@@ -106,7 +118,7 @@ func test() {
 	fmt.Println("Loaded config!")
 	printStruct(cfg)
 
-	scraper, err := scrapers.FromConfig(cfg.Scraper)
+	scraper, err := scraperregistry.NewScraperFromConfig(cfg.Scraper)
 	if err != nil {
 		fmt.Println("Failed to instantiate scraper from config!", err)
 		return

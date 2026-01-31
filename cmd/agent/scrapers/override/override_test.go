@@ -1,9 +1,10 @@
-package scrapers
+package override
 
 import (
 	"context"
 	"testing"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__no_override",
 			Override: ScraperOverrideWrapper{
-				scraper: ScraperMock{
+				scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
@@ -43,7 +44,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__override_max_players",
 			Override: ScraperOverrideWrapper{
-				scraper: ScraperMock{
+				scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
@@ -66,7 +67,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__override_info",
 			Override: ScraperOverrideWrapper{
-				scraper: ScraperMock{
+				scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
