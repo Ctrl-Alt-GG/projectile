@@ -4,6 +4,7 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/dummy"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/minecraft"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/openttd"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/satisfactory"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/script"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/static"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/supertuxkart"
@@ -19,4 +20,5 @@ func init() {
 	RegisterScraper("static", static.New)
 	RegisterScraper("valve", valve.New)
 	RegisterScraper("supertuxkart", supertuxkart.New)
+	RegisterScraper("satisfactory", satisfactory.New)
 }

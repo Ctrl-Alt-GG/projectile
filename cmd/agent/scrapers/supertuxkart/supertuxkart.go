@@ -4,18 +4,18 @@ import (
 	"context"
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
-	"github.com/go-viper/mapstructure/v2"
 	"go.uber.org/zap"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type ScraperConfig struct {
-	DBPath     string `mapstructure:"db_path"`
-	PSGrep     string `mapstructure:"psgrep"`      // ensure that the server is running by looking for the executable
-	MaxPlayers uint32 `mapstructure:"max_players"` // I'm just gonna hard-code this here...
+	DBPath     string `mapstructure:"db_path" validate:"required"`
+	PSGrep     string `mapstructure:"psgrep"`                          // ensure that the server is running by looking for the executable
+	MaxPlayers uint32 `mapstructure:"max_players" validate:"required"` // I'm just gonna hard-code this here...
 }
 
 type Scraper struct {
@@ -24,8 +24,7 @@ type Scraper struct {
 
 func New(cfg map[string]any) (scrapers.Scraper, error) {
 	var sConfig ScraperConfig
-
-	err := mapstructure.Decode(cfg, &sConfig)
+	err := internal.LoadScraperConfig(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}

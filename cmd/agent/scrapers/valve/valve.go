@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/rumblefrog/go-a2s"
 	"go.uber.org/zap"
 )
@@ -21,8 +21,7 @@ type Scraper struct {
 
 func New(cfg map[string]any) (scrapers.Scraper, error) {
 	var sConfig ScraperConfig
-
-	err := mapstructure.Decode(cfg, &sConfig)
+	err := internal.LoadScraperConfig(cfg, &sConfig)
 	if err != nil {
 		return nil, err
 	}
