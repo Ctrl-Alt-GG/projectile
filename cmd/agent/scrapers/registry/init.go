@@ -2,6 +2,7 @@ package registry
 
 import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/dummy"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/factorio"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/minecraft"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/openttd"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/satisfactory"
@@ -21,4 +22,5 @@ func init() {
 	RegisterScraper("valve", valve.New)
 	RegisterScraper("supertuxkart", supertuxkart.New)
 	RegisterScraper("satisfactory", satisfactory.New)
+	RegisterScraper("factorio", factorio.New)
 }
