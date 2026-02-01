@@ -36,7 +36,6 @@ func New(cfg map[string]any) (scrapers.Scraper, error) {
 func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 
 	var d net.Dialer
-
 	conn, err := d.DialContext(ctx, "tcp", s.config.Address)
 	if err != nil {
 		logger.Error("Failed to dial OpenTTD server", zap.Error(err))
