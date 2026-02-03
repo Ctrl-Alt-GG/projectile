@@ -77,6 +77,8 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 				Score: utils.Ptr(int32(ply.Score)), // this is presented as uint32 but that's wrong...
 			}
 		}
+	} else {
+		onlinePlayers = make([]model.Player, 0) // make sure it's always presented as an empty list instead of null
 	}
 
 	return model.GameServerDynamicData{
