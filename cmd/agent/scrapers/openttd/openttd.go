@@ -57,14 +57,14 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 
 	// do a check on the context after sending the bytes
 	if ctx.Err() != nil {
-		return model.GameServerDynamicData{}, err
+		return model.GameServerDynamicData{}, ctx.Err()
 	}
 
 	var info NetworkServerGameInfo
 	reader := ctxio.NewReader(ctx, conn)
 	info, err = ParseNetworkGameInfo(reader)
 	if err != nil {
-		logger.Error("Failed to send the query byte sequence", zap.Error(err))
+		logger.Error("Failed to parse response from OpenTTD server", zap.Error(err))
 		return model.GameServerDynamicData{}, err
 	}
 

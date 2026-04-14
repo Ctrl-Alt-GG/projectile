@@ -2,7 +2,8 @@ package minecraft
 
 import (
 	"context"
-	"fmt"
+	"net"
+	"strconv"
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
@@ -32,8 +33,18 @@ func New(cfg map[string]any) (scrapers.Scraper, error) {
 }
 
 func (m Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
+	host, portStr, err := net.SplitHostPort(m.config.Address)
+	if err != nil {
+		logger.Error("Failed to parse Minecraft server address", zap.Error(err), zap.String("addr", m.config.Address))
+		return model.GameServerDynamicData{}, err
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		logger.Error("Failed to parse Minecraft server port", zap.Error(err), zap.String("addr", m.config.Address))
+		return model.GameServerDynamicData{}, err
+	}
 
-	res, err := minequery.QueryFull("localhost", 25565)
+	res, err := minequery.QueryFull(host, port)
 	if err != nil {
 		logger.Error("Failed query the Minecraft server", zap.Error(err), zap.String("addr", m.config.Address))
 		return model.GameServerDynamicData{}, err
@@ -45,8 +56,6 @@ func (m Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 			Name: playerName,
 		}
 	}
-
-	fmt.Printf("%+v", res)
 
 	return model.GameServerDynamicData{
 		Info:               res.MOTD,

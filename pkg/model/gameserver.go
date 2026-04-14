@@ -73,7 +73,7 @@ func (gssd GameServerStaticData) Validate() error {
 		}
 	}
 
-	if gssd.Capabilities.IsValid() {
+	if !gssd.Capabilities.IsValid() {
 		return fmt.Errorf("capabilities are invalid")
 	}
 

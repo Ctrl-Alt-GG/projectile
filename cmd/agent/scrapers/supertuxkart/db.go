@@ -58,5 +58,10 @@ func QueryPlayers(ctx context.Context, logger *zap.Logger, dbPath string) ([]mod
 		}
 	}
 
+	if err = rows.Err(); err != nil {
+		logger.Error("Error after iterating rows", zap.Error(err))
+		return nil, err
+	}
+
 	return players, nil
 }

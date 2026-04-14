@@ -1,6 +1,8 @@
 package http
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"gitlab.com/MikeTTh/env"
 	"go.uber.org/zap"
@@ -36,7 +38,7 @@ func RunServer(logger *zap.Logger) error {
 	apiGroup.GET("servers", getAllGameServersPublic)
 	apiGroup.GET("announcement", getAnnouncement)
 	apiGroup.GET("bundle", getBundle) // get all data in one request
-	apiGroup.GET("ping")
+	apiGroup.GET("ping", func(ctx *gin.Context) { ctx.Status(http.StatusOK) })
 
 	// start stuff
 	tlsCert := env.String("HTTPS_TLS_CERT", "")

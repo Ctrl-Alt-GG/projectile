@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/config"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
@@ -21,7 +22,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__no_override",
 			Override: ScraperOverrideWrapper{
-				scraper: scrapers.ScraperMock{
+				Scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
@@ -31,8 +32,10 @@ func TestOverride(t *testing.T) {
 						}, nil
 					},
 				},
-				MaxPlayers: nil,
-				Info:       nil,
+				Config: config.ScraperOverrides{
+					MaxPlayers: nil,
+					Info:       nil,
+				},
 			},
 			expectedData: model.GameServerDynamicData{
 				Info:               "hello",
@@ -44,7 +47,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__override_max_players",
 			Override: ScraperOverrideWrapper{
-				scraper: scrapers.ScraperMock{
+				Scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
@@ -54,8 +57,10 @@ func TestOverride(t *testing.T) {
 						}, nil
 					},
 				},
-				MaxPlayers: utils.Ptr(uint32(14)),
-				Info:       nil,
+				Config: config.ScraperOverrides{
+					MaxPlayers: utils.Ptr(uint32(14)),
+					Info:       nil,
+				},
 			},
 			expectedData: model.GameServerDynamicData{
 				Info:               "hello",
@@ -67,7 +72,7 @@ func TestOverride(t *testing.T) {
 		{
 			name: "happy__override_info",
 			Override: ScraperOverrideWrapper{
-				scraper: scrapers.ScraperMock{
+				Scraper: scrapers.ScraperMock{
 					ScrapeFn: func(ctx context.Context, logger *zap.Logger) (model.GameServerDynamicData, error) {
 						return model.GameServerDynamicData{
 							Info:               "hello",
@@ -77,8 +82,10 @@ func TestOverride(t *testing.T) {
 						}, nil
 					},
 				},
-				MaxPlayers: nil,
-				Info:       utils.Ptr("good bye"),
+				Config: config.ScraperOverrides{
+					MaxPlayers: nil,
+					Info:       utils.Ptr("good bye"),
+				},
 			},
 			expectedData: model.GameServerDynamicData{
 				Info:               "good bye",
