@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	gitlab.com/MikeTTh/env v0.0.0-20231129141211-633d5922a426
 	go.uber.org/zap v1.27.1
-	google.golang.org/grpc v1.78.0
+	google.golang.org/grpc v1.79.3
 	google.golang.org/protobuf v1.36.11
 	gopkg.in/yaml.v3 v3.0.1
 )
