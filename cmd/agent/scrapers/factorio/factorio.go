@@ -63,7 +63,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	var maxPlayers uint64
 	maxPlayers, err = strconv.ParseUint(strings.TrimSpace(response.Body), 10, 32)
 	if err != nil {
-		logger.Error("Could not parse max player count")
+		logger.Error("Could not parse max player count", zap.Error(err), zap.String("responseBody", response.Body))
 		return model.GameServerDynamicData{}, err
 	}
 
