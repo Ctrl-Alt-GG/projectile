@@ -6,11 +6,13 @@ export CGO_ENABLED := 1
 all: bin/server bin/agent
 
 .PHONY:
-bin/server: pkg/agentmsg/agentmsg.pb.go pkg/agentmsg/agentmsg_grpc.pb.go bin
+clean:
+	rm -rf bin/
+
+bin/server: pkg/agentmsg/agentmsg.pb.go pkg/agentmsg/agentmsg_grpc.pb.go | bin
 	go build -v -o bin/server ./cmd/server
 
-.PHONY:
-bin/agent: pkg/agentmsg/agentmsg.pb.go pkg/agentmsg/agentmsg_grpc.pb.go bin
+bin/agent: pkg/agentmsg/agentmsg.pb.go pkg/agentmsg/agentmsg_grpc.pb.go | bin
 	go build -v -o bin/agent ./cmd/agent
 
 bin:
