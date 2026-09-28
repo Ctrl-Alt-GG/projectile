@@ -2,6 +2,7 @@ package valve
 
 import (
 	"context"
+	"slices"
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
@@ -63,6 +64,25 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 			// just alter the response we got...
 			players = nil
 			info.Players = 0
+			logger.Debug("CS2 Workaround: 'empty server' applied")
+		}
+
+		// This is a new weird state, the server just became a player by itself...
+		if players != nil {
+			idxToRemove := -1
+			for i, ply := range players.Players {
+				if ply.Name == info.Name {
+					idxToRemove = i
+					break
+				}
+			}
+
+			if idxToRemove >= 0 {
+				players.Players = slices.Delete(players.Players, idxToRemove, idxToRemove+1)
+				players.Count--
+				info.Players--
+				logger.Debug("CS2 Workaround: 'remove server name' applied")
+			}
 		}
 	}
 
