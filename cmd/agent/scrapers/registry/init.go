@@ -9,6 +9,7 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/script"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/static"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/supertuxkart"
+	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/ts3"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/valve"
 )
 
@@ -23,4 +24,5 @@ func init() {
 	RegisterScraper("supertuxkart", supertuxkart.New)
 	RegisterScraper("satisfactory", satisfactory.New)
 	RegisterScraper("factorio", factorio.New)
+	RegisterScraper("ts3", ts3.New)
 }
