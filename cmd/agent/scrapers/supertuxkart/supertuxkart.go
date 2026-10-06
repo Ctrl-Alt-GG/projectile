@@ -13,9 +13,9 @@ import (
 )
 
 type ScraperConfig struct {
-	DBPath     string `mapstructure:"db_path" validate:"required"`
-	PSGrep     string `mapstructure:"psgrep"`                          // ensure that the server is running by looking for the executable
-	MaxPlayers uint32 `mapstructure:"max_players" validate:"required"` // I'm just gonna hard-code this here...
+	DBPath     string `mapstructure:"dbPath" validate:"required"`
+	PSGrep     string `mapstructure:"psgrep"`                         // ensure that the server is running by looking for the executable
+	MaxPlayers uint32 `mapstructure:"maxPlayers" validate:"required"` // I'm just gonna hard-code this here...
 }
 
 type Scraper struct {

@@ -14,7 +14,7 @@ import (
 
 type ScraperConfig struct {
 	Address       string `mapstructure:"address" default:"127.0.0.1"`
-	WorkaroundCS2 bool   `mapstructure:"workaround_cs2" default:"false"` // THIS ALSO NEEDS THIS TO BE INSTALLED ON THE SERVER: https://github.com/Source2ZE/ServerListPlayersFix !!!
+	WorkaroundCS2 bool   `mapstructure:"workaroundCS2" default:"false"` // THIS ALSO NEEDS THIS TO BE INSTALLED ON THE SERVER: https://github.com/Source2ZE/ServerListPlayersFix !!!
 }
 
 type Scraper struct {

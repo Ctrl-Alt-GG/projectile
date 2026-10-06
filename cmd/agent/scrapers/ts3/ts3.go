@@ -16,9 +16,9 @@ import (
 )
 
 type ScraperConfig struct {
-	APIURL          string `mapstructure:"api_url" default:"http://127.0.0.1:10080"`
-	APIKey          string `mapstructure:"api_key"`
-	VirtualServerID int    `mapstructure:"virtual_server_id" default:"1"`
+	APIURL          string `mapstructure:"apiURL" default:"http://127.0.0.1:10080"`
+	APIKey          string `mapstructure:"apiKey"`
+	VirtualServerID int    `mapstructure:"virtualServerID" default:"1"`
 }
 
 type Scraper struct {

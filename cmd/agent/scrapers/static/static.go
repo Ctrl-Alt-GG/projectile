@@ -13,7 +13,7 @@ import (
 type ScraperConfig struct {
 	PSGrep     string `mapstructure:"psgrep"`
 	Info       string `mapstructure:"info"`
-	MaxPlayers uint32 `mapstructure:"max_players" validate:"required"`
+	MaxPlayers uint32 `mapstructure:"maxPlayers" validate:"required"`
 }
 
 type Scraper struct {
