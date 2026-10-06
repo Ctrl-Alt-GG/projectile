@@ -53,6 +53,7 @@ type GameServerDynamicData struct {
 type GameServerStaticData struct {
 	Game         string       `json:"game"`
 	Name         string       `json:"name"`
+	AgentVersion string       `json:"agent_version"`
 	Addresses    []string     `json:"addresses"`
 	Capabilities Capabilities `json:"capabilities"`
 }
@@ -88,10 +89,11 @@ type GameServerData struct {
 
 func (gsd GameServerData) ToProtobuf() *agentmsg.GameServer {
 	pb := agentmsg.GameServer{
-		Game:      gsd.Game,
-		Name:      gsd.Name,
-		Addresses: gsd.Addresses,
-		Info:      utils.NilStrPtr(gsd.Info),
+		Game:         gsd.Game,
+		Name:         gsd.Name,
+		AgentVersion: gsd.AgentVersion,
+		Addresses:    gsd.Addresses,
+		Info:         utils.NilStrPtr(gsd.Info),
 		Capabilities: &agentmsg.GameServer_Capabilities{
 			PlayerCount: gsd.Capabilities.PlayerCount,
 			PlayerNames: gsd.Capabilities.PlayerNames,
@@ -151,6 +153,7 @@ func (gsd GameServerData) Copy() GameServerData {
 		GameServerStaticData: GameServerStaticData{
 			Game:         gsd.Game,
 			Name:         gsd.Name,
+			AgentVersion: gsd.AgentVersion,
 			Addresses:    slices.Clone(gsd.Addresses),
 			Capabilities: gsd.Capabilities,
 		},
@@ -179,6 +182,7 @@ func GameServerDataFromProtobuf(server *agentmsg.GameServer) (GameServerData, bo
 		GameServerStaticData: GameServerStaticData{
 			Game:         server.GetGame(),
 			Name:         server.GetName(),
+			AgentVersion: server.GetAgentVersion(),
 			Addresses:    server.GetAddresses(),
 			Capabilities: translatedCaps,
 		},

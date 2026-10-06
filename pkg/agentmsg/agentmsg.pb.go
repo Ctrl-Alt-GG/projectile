@@ -26,6 +26,7 @@ type GameServer struct {
 	state              protoimpl.MessageState   `protogen:"open.v1"`
 	Game               string                   `protobuf:"bytes,1,opt,name=game,proto3" json:"game,omitempty"`
 	Name               string                   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	AgentVersion       string                   `protobuf:"bytes,9,opt,name=agent_version,json=agentVersion,proto3" json:"agent_version,omitempty"`
 	Addresses          []string                 `protobuf:"bytes,3,rep,name=addresses,proto3" json:"addresses,omitempty"`
 	Info               *string                  `protobuf:"bytes,4,opt,name=info,proto3,oneof" json:"info,omitempty"` // optional extra info
 	Capabilities       *GameServer_Capabilities `protobuf:"bytes,5,opt,name=capabilities,proto3" json:"capabilities,omitempty"`
@@ -76,6 +77,13 @@ func (x *GameServer) GetGame() string {
 func (x *GameServer) GetName() string {
 	if x != nil {
 		return x.Name
+	}
+	return ""
+}
+
+func (x *GameServer) GetAgentVersion() string {
+	if x != nil {
+		return x.AgentVersion
 	}
 	return ""
 }
@@ -263,11 +271,12 @@ var File_agentmsg_proto protoreflect.FileDescriptor
 const file_agentmsg_proto_rawDesc = "" +
 	"\n" +
 	"\x0eagentmsg.proto\x12\n" +
-	"projectile\x1a\x1bgoogle/protobuf/empty.proto\"\x97\x05\n" +
+	"projectile\x1a\x1bgoogle/protobuf/empty.proto\"\xbc\x05\n" +
 	"\n" +
 	"GameServer\x12\x12\n" +
 	"\x04game\x18\x01 \x01(\tR\x04game\x12\x12\n" +
-	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1c\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12#\n" +
+	"\ragent_version\x18\t \x01(\tR\fagentVersion\x12\x1c\n" +
 	"\taddresses\x18\x03 \x03(\tR\taddresses\x12\x17\n" +
 	"\x04info\x18\x04 \x01(\tH\x00R\x04info\x88\x01\x01\x12G\n" +
 	"\fcapabilities\x18\x05 \x01(\v2#.projectile.GameServer.CapabilitiesR\fcapabilities\x12\x1f\n" +

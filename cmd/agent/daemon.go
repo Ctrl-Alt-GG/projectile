@@ -47,6 +47,7 @@ func initGameServerData(logger *zap.Logger, cfg config.GameData, scraper scraper
 
 	}
 	data.GameServerStaticData.Capabilities = scraper.Capabilities()
+	data.GameServerStaticData.AgentVersion = utils.GetLongVersion()
 	return data
 }
 
