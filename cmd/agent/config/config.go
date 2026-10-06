@@ -10,13 +10,13 @@ import (
 	"github.com/creasty/defaults"
 )
 
-const ConfigDefaultPath = "/etc/projectile_agent/config.yaml"
+const DefaultPath = "/etc/projectile_agent/config.yaml"
 
 func LoadConfig(logger *zap.Logger, pathOverride string) (AgentConfig, error) {
 	var err error
 
 	// open file
-	configPath := ConfigDefaultPath
+	configPath := DefaultPath
 	if pathOverride != "" {
 		configPath = pathOverride
 	}

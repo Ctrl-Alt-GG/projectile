@@ -11,7 +11,6 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
-	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -114,7 +113,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               "",
 		MaxPlayers:         uint32(maxClients),
-		OnlinePlayersCount: utils.Ptr(uint32(len(players))), // ts counts all sorts of things as clients, so this is more reliable
+		OnlinePlayersCount: new(uint32(len(players))), // ts counts all sorts of things as clients, so this is more reliable
 		OnlinePlayers:      &players,
 	}, nil
 }

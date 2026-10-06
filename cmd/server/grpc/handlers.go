@@ -40,7 +40,7 @@ func (s *GameServersHandler) Updates(stream grpc.ClientStreamingServer[agentmsg.
 
 		update, ok := model.GameServerDataFromProtobuf(updateMsg)
 		if !ok {
-			l.Warn("Client sent an invalid error")
+			l.Warn("Client sent an invalid update")
 			return ErrInvalidUpdate
 		}
 

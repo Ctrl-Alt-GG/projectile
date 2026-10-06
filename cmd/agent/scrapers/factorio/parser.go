@@ -40,8 +40,9 @@ func parseRCONPlayersList(output string) ([]string, error) {
 
 		if name != "" {
 			numPly++
-			if strings.HasSuffix(name, " (online)") {
-				name = strings.TrimSuffix(name, " (online)")
+			var isOnline bool
+			name, isOnline = strings.CutSuffix(name, " (online)")
+			if isOnline {
 				name = strings.TrimSpace(name)
 				if name != "" {
 					online = append(online, name)

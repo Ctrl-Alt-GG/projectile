@@ -78,7 +78,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               infoStr,
 		MaxPlayers:         uint32(info.ClientsMax),
-		OnlinePlayersCount: utils.Ptr(uint32(info.ClientsOn)),
+		OnlinePlayersCount: new(uint32(info.ClientsOn)),
 		OnlinePlayers:      nil, // :(
 	}, err
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// It will be easier to deal with like this
+// AnnouncementWrapper makes it easier to deal with the announcement.
 type AnnouncementWrapper struct {
 	Text string `json:"text"`
 }

@@ -68,10 +68,8 @@ func (gssd GameServerStaticData) Validate() error {
 	if len(gssd.Addresses) == 0 {
 		return fmt.Errorf("addresses is empty")
 	}
-	for _, addr := range gssd.Addresses {
-		if addr == "" {
-			return fmt.Errorf("one or more addresses are empty")
-		}
+	if slices.Contains(gssd.Addresses, "") {
+		return fmt.Errorf("one or more addresses are empty")
 	}
 
 	if gssd.Capabilities.IsValid() {
@@ -150,19 +148,15 @@ func (gsd GameServerData) Copy() GameServerData {
 	}
 
 	return GameServerData{
-		GameServerStaticData: GameServerStaticData{
-			Game:         gsd.Game,
-			Name:         gsd.Name,
-			AgentVersion: gsd.AgentVersion,
-			Addresses:    slices.Clone(gsd.Addresses),
-			Capabilities: gsd.Capabilities,
-		},
-		GameServerDynamicData: GameServerDynamicData{
-			Info:               gsd.Info,
-			MaxPlayers:         gsd.MaxPlayers,
-			OnlinePlayersCount: utils.ValCopy(gsd.OnlinePlayersCount), // Ptr actually makes a copy, while simply dereferencing doesn't. See https://goplay.tools/snippet/ipMDVGHhgOU
-			OnlinePlayers:      playersCopy,
-		},
+		Game:               gsd.Game,
+		Name:               gsd.Name,
+		AgentVersion:       gsd.AgentVersion,
+		Addresses:          slices.Clone(gsd.Addresses),
+		Capabilities:       gsd.Capabilities,
+		Info:               gsd.Info,
+		MaxPlayers:         gsd.MaxPlayers,
+		OnlinePlayersCount: utils.ValCopy(gsd.OnlinePlayersCount), // Ptr actually makes a copy, while simply dereferencing doesn't. See https://goplay.tools/snippet/ipMDVGHhgOU
+		OnlinePlayers:      playersCopy,
 	}
 }
 
@@ -179,22 +173,18 @@ func GameServerDataFromProtobuf(server *agentmsg.GameServer) (GameServerData, bo
 	}
 
 	gsd := GameServerData{
-		GameServerStaticData: GameServerStaticData{
-			Game:         server.GetGame(),
-			Name:         server.GetName(),
-			AgentVersion: server.GetAgentVersion(),
-			Addresses:    server.GetAddresses(),
-			Capabilities: translatedCaps,
-		},
-		GameServerDynamicData: GameServerDynamicData{
-			Info:               server.GetInfo(),
-			MaxPlayers:         server.GetMaxPlayers(),
-			OnlinePlayersCount: nil,
-			OnlinePlayers:      nil,
-		},
+		Game:               server.GetGame(),
+		Name:               server.GetName(),
+		AgentVersion:       server.GetAgentVersion(),
+		Addresses:          server.GetAddresses(),
+		Capabilities:       translatedCaps,
+		Info:               server.GetInfo(),
+		MaxPlayers:         server.GetMaxPlayers(),
+		OnlinePlayersCount: nil,
+		OnlinePlayers:      nil,
 	}
 	if translatedCaps.PlayerCount {
-		gsd.OnlinePlayersCount = utils.Ptr(server.GetOnlinePlayersCount())
+		gsd.OnlinePlayersCount = new(server.GetOnlinePlayersCount())
 	}
 
 	serverOnlinePlayers := server.GetOnlinePlayers()
@@ -211,10 +201,10 @@ func GameServerDataFromProtobuf(server *agentmsg.GameServer) (GameServerData, bo
 			}
 
 			if translatedCaps.PlayerScore {
-				players[i].Score = utils.Ptr(ply.GetScore())
+				players[i].Score = new(ply.GetScore())
 			}
 			if translatedCaps.PlayerTeam {
-				players[i].Team = utils.Ptr(ply.GetTeam())
+				players[i].Team = new(ply.GetTeam())
 			}
 
 		}

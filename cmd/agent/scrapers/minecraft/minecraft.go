@@ -51,7 +51,7 @@ func (m Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               res.MOTD,
 		MaxPlayers:         uint32(res.MaxPlayers),
-		OnlinePlayersCount: utils.Ptr(uint32(res.OnlinePlayers)),
+		OnlinePlayersCount: new(uint32(res.OnlinePlayers)),
 		OnlinePlayers:      &plyList,
 	}, nil
 }

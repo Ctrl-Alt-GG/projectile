@@ -7,7 +7,6 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
-	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"github.com/rumblefrog/go-a2s"
 	"go.uber.org/zap"
 )
@@ -94,7 +93,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 		for i, ply := range players.Players {
 			onlinePlayers[i] = model.Player{
 				Name:  ply.Name,
-				Score: utils.Ptr(int32(ply.Score)), // this is presented as uint32 but that's wrong...
+				Score: new(ply.Score),
 			}
 		}
 	} else {
@@ -104,7 +103,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               info.Map,
 		MaxPlayers:         uint32(info.MaxPlayers),
-		OnlinePlayersCount: utils.Ptr(uint32(info.Players)),
+		OnlinePlayersCount: new(uint32(info.Players)),
 		OnlinePlayers:      &onlinePlayers,
 	}, nil
 }

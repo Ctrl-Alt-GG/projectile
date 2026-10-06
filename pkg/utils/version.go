@@ -15,7 +15,8 @@ func GetShortVersion() string {
 
 func GetLongVersion() string {
 	verStr := fmt.Sprintf("%s_%s", version, commitHash)
-	if dirty != "" {
+	if //goland:noinspection GoBoolExpressions This is an injected variable
+	dirty != "" {
 		verStr += "-dirty"
 	}
 	return verStr

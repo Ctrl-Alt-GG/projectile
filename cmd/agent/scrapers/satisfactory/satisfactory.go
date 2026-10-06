@@ -7,7 +7,6 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers/internal"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
-	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -40,7 +39,7 @@ func (s Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               fmt.Sprintf("Tier %d", resp.Data.ServerGameState.TechTier),
 		MaxPlayers:         uint32(resp.Data.ServerGameState.PlayerLimit),
-		OnlinePlayersCount: utils.Ptr(uint32(resp.Data.ServerGameState.NumConnectedPlayers)),
+		OnlinePlayersCount: new(uint32(resp.Data.ServerGameState.NumConnectedPlayers)),
 	}, nil
 }
 

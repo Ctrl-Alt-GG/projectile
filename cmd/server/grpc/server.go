@@ -48,7 +48,7 @@ func RunServer(logger *zap.Logger) error {
 
 	// Second, the interceptors
 
-	basichAuthn, err := authn.NewBasicAuthProvider(env.StringOrPanic("AGENT_HTPASSWD_PATH"))
+	basicAuthn, err := authn.NewBasicAuthProvider(env.StringOrPanic("AGENT_HTPASSWD_PATH"))
 	if err != nil {
 		logger.Error("Failed to load basic authentication credentials", zap.Error(err))
 		return err
@@ -56,11 +56,11 @@ func RunServer(logger *zap.Logger) error {
 
 	opts = append(opts,
 		grpc.ChainUnaryInterceptor(
-			unaryAuthnInterceptor(basichAuthn),
+			unaryAuthnInterceptor(basicAuthn),
 			unaryLoggerInterceptor(logger),
 		),
 		grpc.ChainStreamInterceptor(
-			streamingAuthnInterceptor(basichAuthn),
+			streamingAuthnInterceptor(basicAuthn),
 			streamingLoggerInterceptor(logger),
 		),
 	)

@@ -63,7 +63,7 @@ func (r *StructReader) ReadUint8Bool() (bool, error) {
 func (r *StructReader) ReadNullTerminatedString(maxLen int) (string, error) {
 	// Read bytes until '\0' or EOF, but not exceeding maxLen.
 	var buf []byte
-	for i := 0; i < maxLen; i++ {
+	for range maxLen {
 		b, err := r.ReadUint8()
 		if err != nil {
 			if err == io.EOF {

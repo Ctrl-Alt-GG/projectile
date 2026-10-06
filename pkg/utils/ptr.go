@@ -2,15 +2,11 @@ package utils
 
 import "fmt"
 
-func Ptr[T any](t T) *T {
-	return &t
-}
-
 func ValCopy[T any](t *T) *T {
 	if t == nil {
 		return nil
 	}
-	return Ptr(*t) // This actually makes a copy https://goplay.tools/snippet/ipMDVGHhgOU
+	return new(*t) // This actually makes a copy https://goplay.tools/snippet/GzO6ESjC-JE
 }
 
 func NilStrPtr(t string) *string {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/Ctrl-Alt-GG/projectile/cmd/agent/scrapers"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/model"
-	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 )
 
@@ -45,8 +44,8 @@ func (d Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 
 		ply[i] = model.Player{
 			Name:  dummyNames[i],
-			Score: utils.Ptr(int32(rand.IntN(110) - 10)),
-			Team:  utils.Ptr(dummyTeams[i%len(dummyTeams)]),
+			Score: new(int32(rand.IntN(110) - 10)),
+			Team:  new(dummyTeams[i%len(dummyTeams)]),
 			Info:  info,
 		}
 	}
@@ -54,7 +53,7 @@ func (d Scraper) Scrape(ctx context.Context, logger *zap.Logger) (model.GameServ
 	return model.GameServerDynamicData{
 		Info:               "Currently doing dummy things",
 		MaxPlayers:         uint32(maxPly),
-		OnlinePlayersCount: utils.Ptr(uint32(onlinePly)),
+		OnlinePlayersCount: new(uint32(onlinePly)),
 		OnlinePlayers:      &ply,
 	}, nil
 }
