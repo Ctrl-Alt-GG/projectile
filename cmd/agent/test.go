@@ -104,6 +104,9 @@ func listScrapers() {
 
 func test() {
 	fmt.Println("Running agent test...")
+	fmt.Println("Short version:", utils.GetShortVersion())
+	fmt.Println("Long version:", utils.GetLongVersion())
+	fmt.Println("Build timestamp:", utils.GetBuildTimestamp())
 
 	listScrapers()
 	fmt.Println("---")

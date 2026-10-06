@@ -65,7 +65,7 @@ func protectedScrape(scraper scrapers.Scraper, ctx context.Context, logger *zap.
 func daemon() {
 	logger := framework.SetupLogger(false)
 	defer logger.Sync()
-	logger.Info("Starting Projectile agent...")
+	logger.Info("Starting Projectile agent...", zap.String("version", utils.GetLongVersion()), zap.String("build", utils.GetBuildTimestamp()))
 
 	cfg, err := config.LoadConfig(logger, "")
 	if err != nil {
@@ -269,5 +269,5 @@ func daemon() {
 	}
 
 	cm.Close(logger)
-	logger.Info("Good bye!")
+	logger.Info("Good bye!", zap.String("version", utils.GetLongVersion()), zap.String("build", utils.GetBuildTimestamp()))
 }

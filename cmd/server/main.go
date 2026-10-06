@@ -7,13 +7,14 @@ import (
 	"github.com/Ctrl-Alt-GG/projectile/cmd/server/grpc"
 	"github.com/Ctrl-Alt-GG/projectile/cmd/server/http"
 	"github.com/Ctrl-Alt-GG/projectile/pkg/framework"
+	"github.com/Ctrl-Alt-GG/projectile/pkg/utils"
 	"go.uber.org/zap"
 )
 
 func main() {
 	logger := framework.SetupLogger(false)
 	defer logger.Sync()
-	logger.Info("Starting Projectile server...")
+	logger.Info("Starting Projectile server...", zap.String("version", utils.GetLongVersion()), zap.String("build", utils.GetBuildTimestamp()))
 
 	// db cleanup job
 	go func() {
